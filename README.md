@@ -21,8 +21,16 @@ iiif_s3 publish <file.csv>
 
 This library assumes that you have ImageMagick installed.  If you need to install it, follow the instructions:
 
-on OSX, `brew install imagemagick` should be sufficient.
+on OSX, `brew install imagemagick ` should be sufficient.
 
+If you have issues with TIFF files, try
+
+```shell
+
+brew update 
+brew reinstall --with-libtiff --ignore-dependencies imagemagick
+
+```
 
 
 Add this line to your application's Gemfile:

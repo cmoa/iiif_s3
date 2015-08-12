@@ -23,11 +23,14 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-rspec"
+  spec.add_development_dependency 'yard'
+
 
 
   spec.add_runtime_dependency "commander", "~> 4.3"
   spec.add_runtime_dependency "aws-sdk", "~> 2.1"
   spec.add_runtime_dependency "mini_magick", "~> 4.2"
+  spec.add_runtime_dependency "rmagick", "~> 2.15"
   spec.add_runtime_dependency "json-ld", "~> 1.1"
   spec.add_runtime_dependency "jsonlint", "~> 0.1"
 end

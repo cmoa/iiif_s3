@@ -1,0 +1,1 @@
+--hide-void-return 'lib/**/*.rb' --title "CMOA IIIF Level 0 Server" --readme README.md --files LICENSE.txt

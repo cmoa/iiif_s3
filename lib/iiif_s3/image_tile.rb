@@ -8,14 +8,12 @@ module IiifS3
 
     attr_reader :region
 
-    def filestring
-      "#{base_path}/#{region}/#{width},/0"
-    end
 
     def initialize(data, config, tile)
 
       # open image
       @image = Image.open(data["img_path"])
+      @tile = tile
 
       #above is redundant, and should be refactored
 
@@ -30,14 +28,20 @@ module IiifS3
 
       @image.format "jpg"
 
-      @base_path = "#{config.prefix}/#{data["id"]}"
-      @path = "#{config.output_dir}#{filestring}"
-      @uri = "#{config.base_uri}#{filestring}/default.jpg"
+      @path = "#{config.build_image_location(data["id"],data["page_number"])}#{filestring}"
+      @uri =  "#{config.image_uri(data['id'],data['page_number'])}#{filestring}/default.jpg"
 
       FileUtils::mkdir_p path
       filename = "#{path}/default.jpg"
       @image.write filename unless File.exists? filename
       filename
     end
+
+    protected
+    
+    def filestring
+      "/#{region}/#{@tile[:xSize]},/0"
+    end
+
   end
 end

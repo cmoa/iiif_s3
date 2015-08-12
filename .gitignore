@@ -21,6 +21,7 @@ tmp
 *.a
 mkmf.log
 
+build/*
+data/*
 
-/data
-!/data/.gitkeep
+!/*/.gitkeep

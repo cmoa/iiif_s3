@@ -1,11 +1,19 @@
 module IiifS3
-
   require 'json/ld'
 
+  #
+  # Module Error collects standard errors for th IiifS3 library.
   module Error
+
+    # Class BlankCSV indicates that a provided CSV has no data.
     class BlankCSV < StandardError; end
+
+    # Class InvalidCSV indicates that there is something wrong with the provided CSV.
     class InvalidCSV < StandardError; end
   end
+
+
+#----------------------------------------
 
   class Builder
 
@@ -21,11 +29,30 @@ module IiifS3
     def initialize(config = IiifS3::Config.new)
       @manifests = []
       @config = config
-      Dir.mkdir config.output_dir unless Dir.exists? config.output_dir
     end
 
 
+    #
+    # Load data into the IIF builder.
+    #
+    # @param [Array<Hash>] data An Array of hashes containing image data.
+    #
+    # @return [Void]
+    # 
+    def load(data)
+      @data = data.sort_by {|datum| [datum["id"], datum["page_number"]] }
+    end
+
+    #
+    # Load data into the IIIF server from a CSV
+    #
+    # @param [String] csv_path Path to the CSV file containing the image data
+    #
+    # @return [Void]
+    # @TODO Fix this to use the correct data format!
+    # 
     def load_csv(csv_path)
+
       raise Error::InvalidCSV unless File.exist? csv_path
       begin
         vals = CSV.read(csv_path)
@@ -35,6 +62,7 @@ module IiifS3
       end  
 
       raise Error::BlankCSV if vals.length == 0
+
       raise Error::InvalidCSV if vals[0].length != 3
 
       # remove optional header
@@ -50,35 +78,42 @@ module IiifS3
       process_data
     end 
 
+
+
     def process_data
+      resources = {}
       @data.each do |datum|
+        #datum["uri"] = @config.uri(datum['id'])
+        
+        #Generate standard variants
         datum["full"] = FullImage.new(datum, @config)
         datum["thumbnail"] = Thumbnail.new(datum, @config)
         reference = ImageVariant.new(datum, @config, 600, 600)
         access = ImageVariant.new(datum, @config, 1200, 1200)
-        datum['tile_width'] ||= 512
-        datum['tile_scale_factors'] ||= [1,2,4,8]
-        tiles = generate_tiles(datum, @config, datum['tile_width'], datum['tile_scale_factors'])
+
+
+
+
+        tiles = generate_tiles(datum, @config)
         tiles.each do |tile|
           ImageTile.new(datum, @config, tile)
         end
 
-        generate_image_json(datum, @config, datum["full"], [datum["thumbnail"], reference, access])
-
-        m = Manifest.new(datum,@config)
-
-        File.open("#{@config.output_dir}#{@config.prefix}/#{datum["id"]}/manifest.json", "w") do |file|
-           file.puts m.to_jsonld
-        end
-        manifests.push(m)
+        generate_image_json(datum, @config, [datum["thumbnail"], reference, access, datum["full"]])
+        resources[datum["id"]] ||= []
+        resources[datum["id"]].push datum
+      end
+      resources.each do |key, val|
+        manifests.push generate_manifest(val, @config) 
       end
     end    
 
-    def generate_tiles(data, config, tile_width = 512, scale_factors = [1,2,4,8]) 
+    def generate_tiles(data, config) 
       width = data["full"].width
+      tile_width = config.tile_width
       height = data["full"].height
       tiles = []
-      scale_factors.each do |s|
+      config.tile_scale_factors.each do |s|
         (0..(height*1.0/(tile_width*s)).floor).each do |tileY|
           (0..(width*1.0/(tile_width*s)).floor).each do |tileX|
             tile = {
@@ -93,7 +128,7 @@ module IiifS3
               ySize: tile_width
             }
             if (tile[:x] + tile[:width]  > width)
-              tile[:width]  = width  - tile[:x] 
+              tile[:width]  = width  - tile[:x]
               tile[:xSize]  = (tile[:width]/(s*1.0)).ceil
             end
             if (tile[:y] + tile[:height] > height)
@@ -107,29 +142,29 @@ module IiifS3
       return tiles
     end
 
-    def generate_image_json(data, config, full, variants) 
-      obj = {}
-      obj["@context"] = IMAGE_CONTEXT
-      obj["@id"] = "#{config.base_uri}#{config.prefix}/#{data["id"]}"
-      obj["protocol"] = IMAGE_PROTOCOL
-      obj["width"] = full.width
-      obj["height"] = full.height
-      obj["sizes"] = variants.collect do |size|
-        {"width" => size.width, "height" => size.height}
-      end
+    def generate_image_json(data, config, variants) 
+      info = ImageInfo.new(data["full"].id, variants ,config.tile_width, config.tile_scale_factors)
 
-      if data["tile_scale_factors"]
-        obj["tiles"] = [{
-          "width" => data["tile_width"],
-          "scaleFactors" => data["tile_scale_factors"]
-        }]
+      filename = "#{config.build_image_location(data['id'],data['page_number'])}/info.json"
+      puts "writing #{filename}"
+      File.open(filename, "w") do |file|
+       file.puts info.to_json 
       end
+      return info
+    end
 
-      obj["profile"] = [IiifS3::LEVEL_0]
+    def generate_manifest(data, config)
+      m = Manifest.new(data, config)
+      path = config.build_location(data.first["id"])
+      FileUtils::mkdir_p path unless Dir.exists? path
 
-      File.open("#{config.output_dir}#{config.prefix}/#{data["id"]}/info.json", "w") do |file|
-       file.puts JSON.pretty_generate obj
+      filename = "#{path}/manifest.json"
+      puts "writing #{filename}"
+
+      File.open(filename, "w") do |file|
+         file.puts m.to_jsonld
       end
+      return m
     end
   end
 end
