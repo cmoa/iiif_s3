@@ -1,6 +1,6 @@
 * [ ] Generate intermediate json files for the sub-components
 * [ ] Make the project respect the .json/no .json config
-* [ ] Add PDF support
+* [X] Add PDF support
 * [ ] Document the configuration object
 * [ ] Stub out file writing for the tests
 * [ ] Figure out how to optimize the image writing

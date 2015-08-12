@@ -1,7 +1,48 @@
 require 'spec_helper'
 
+
 describe IiifS3::Builder do
   let (:iiif) { IiifS3::Builder.new }
+  let (:test_object_0) {{"id" => 1, "page_number" => 1}}
+  let (:test_object_1) {{"id" => 2, "page_number" => 1}}
+  let (:test_object_2) {{"id" => 2, "page_number" => 2}}
+  let (:data) {[test_object_0, test_object_1,test_object_2]}
+
+  context "When initializing" do
+    it "generates manifests" do
+      expect(iiif.manifests).to eq(Array.new)
+    end
+    it "uses the default config" do
+      expect(iiif.config).to eq(IiifS3::Config.new)
+    end
+    it "will accept a configuration hash" do
+      opts = {tile_width: 99}
+      iiif2 = IiifS3::Builder.new(opts)
+      expect(iiif2.config.tile_width).to eq(99)
+    end
+  end
+
+  context "loading data" do
+    it "will accept an array of objects" do
+      iiif.load(data)
+      expect(iiif.data).to eq(data)
+    end 
+    it "will accept a single object" do 
+      iiif.load(test_object_1)
+      expect(iiif.data).to eq([test_object_1])
+    end
+    it "will sort objects into ID and page order " do 
+      iiif.load([test_object_2,test_object_0,test_object_1])
+      expect(iiif.data).to eq(data)
+    end
+
+    it "will error if the data is bad" do
+      expect{iiif.load({random: "hash"})}.to raise_error(IiifS3::Error::InvalidImageData)
+      expect{iiif.load([{random: "hash"}])}.to raise_error(IiifS3::Error::InvalidImageData)
+    end
+  end
+
+
 
   context "When load_csving CSV files" do
     it "accepts a path" do

@@ -19,12 +19,6 @@ module IiifS3
       end
     end
 
-    def create_build_directories
-      Dir.mkdir build_location("") unless Dir.exists?(build_location(""))
-      imgdir = build_image_location("","").split("/")[0...-1].join("/")
-      Dir.mkdir imgdir unless Dir.exists?(imgdir)
-    end
-
     def build_location(id)
       "#{output_dir}#{prefix}/#{id}"
     end
@@ -40,5 +34,14 @@ module IiifS3
     def image_uri(id, page_number)
       "#{base_uri}#{prefix}/#{image_directory_name}/#{id}-#{page_number}"
     end
+
+    def ==(other_config)
+      valid = true
+      self.instance_variables.each do |v|
+        valid &&= instance_variable_get(v) == other_config.instance_variable_get(v)
+      end
+      valid
+    end
+
   end
 end

@@ -1,98 +1,59 @@
 module IiifS3
   require 'json/ld'
 
-  #
-  # Module Error collects standard errors for th IiifS3 library.
-  module Error
-
-    # Class BlankCSV indicates that a provided CSV has no data.
-    class BlankCSV < StandardError; end
-
-    # Class InvalidCSV indicates that there is something wrong with the provided CSV.
-    class InvalidCSV < StandardError; end
-  end
-
-
-#----------------------------------------
 
   class Builder
-
     HEADER_VAL = 'filename'
-    attr_reader :data, :manifests
+    attr_reader :data, :manifests, :config
 
 
     #
     # Initialize the builder.
     #
-    # @param [IiifS3::Config] config an optional configuration object
+    # @param [Hash] config an optional configuration object.
+    # @see IiifS3::Config
+    # @return [Void]
     # 
-    def initialize(config = IiifS3::Config.new)
+    def initialize(config = {})
       @manifests = []
-      @config = config
+      @config = IiifS3::Config.new(config)
     end
 
 
     #
-    # Load data into the IIF builder.
+    # Load data into the IIF builder. 
+    # 
+    # This will load the data, perform some basic verifications on it, and sort
+    # it into proper order.
     #
-    # @param [Array<Hash>] data An Array of hashes containing image data.
-    #
+    # @param [Array<Hash>, Hash] either a single imagedata hash or an Array of  imagedata hashes.
+    # 
+    # @raise [IiifS3::Error::InvalidImageData] if any of the data does 
+    #   not pass the validation checks
+    # 
     # @return [Void]
     # 
     def load(data)
+      data = [data].flatten # handle hashes and arrays of hashes
+
+      data.each {|datum| raise IiifS3::Error::InvalidImageData if datum["id"].nil? || datum["page_number"].nil? }
+
       @data = data.sort_by {|datum| [datum["id"], datum["page_number"]] }
     end
 
-    #
-    # Load data into the IIIF server from a CSV
-    #
-    # @param [String] csv_path Path to the CSV file containing the image data
-    #
-    # @return [Void]
-    # @TODO Fix this to use the correct data format!
-    # 
-    def load_csv(csv_path)
-
-      raise Error::InvalidCSV unless File.exist? csv_path
-      begin
-        vals = CSV.read(csv_path)
-
-      rescue CSV::MalformedCSVError
-        raise Error::InvalidCSV
-      end  
-
-      raise Error::BlankCSV if vals.length == 0
-
-      raise Error::InvalidCSV if vals[0].length != 3
-
-      # remove optional header
-      vals.shift if vals[0][0] == HEADER_VAL
-
-      @data = vals.collect do |data|
-        {
-          "img_path" => data[0],
-          "id"       => data[1],
-          "label"    => data[2]
-        }
-      end
-      process_data
-    end 
+    
 
 
 
     def process_data
       resources = {}
       @data.each do |datum|
-        #datum["uri"] = @config.uri(datum['id'])
         
         #Generate standard variants
         datum["full"] = FullImage.new(datum, @config)
         datum["thumbnail"] = Thumbnail.new(datum, @config)
         reference = ImageVariant.new(datum, @config, 600, 600)
         access = ImageVariant.new(datum, @config, 1200, 1200)
-
-
-
 
         tiles = generate_tiles(datum, @config)
         tiles.each do |tile|
@@ -108,7 +69,18 @@ module IiifS3
       end
     end    
 
+    # Creates the required directories for exporting to the file system.
+    #
+    # @return [Void]
+    def create_build_directories
+      root_dir =  @config.build_location("")
+      Dir.mkdir root_dir unless Dir.exists?(root_dir)
+      img_dir = @config.build_image_location("","").split("/")[0...-1].join("/")
+      Dir.mkdir img_dir unless Dir.exists?(img_dir)
+    end
+
     def generate_tiles(data, config) 
+
       width = data["full"].width
       tile_width = config.tile_width
       height = data["full"].height
@@ -166,5 +138,44 @@ module IiifS3
       end
       return m
     end
+
+
+
+
+
+
+    #
+    # Load data into the IIIF server from a CSV
+    #
+    # @param [String] csv_path Path to the CSV file containing the image data
+    #
+    # @return [Void]
+    # @TODO Fix this to use the correct data format!
+    # 
+    def load_csv(csv_path)
+
+      raise Error::InvalidCSV unless File.exist? csv_path
+      begin
+        vals = CSV.read(csv_path)
+
+      rescue CSV::MalformedCSVError
+        raise Error::InvalidCSV
+      end  
+
+      raise Error::BlankCSV if vals.length == 0
+
+      raise Error::InvalidCSV if vals[0].length != 3
+
+      # remove optional header
+      vals.shift if vals[0][0] == HEADER_VAL
+
+      @data = vals.collect do |data|
+        {
+          "img_path" => data[0],
+          "id"       => data[1],
+          "label"    => data[2]
+        }
+      end
+    end 
   end
 end

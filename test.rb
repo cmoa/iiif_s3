@@ -5,16 +5,10 @@ opts = {}
 opts[:image_directory_name] = "img"
 opts[:output_dir] = "/Users/david/Documents/opensource/mirador"
 
-config = IiifS3::Config.new(opts)
-iiif = IiifS3::Builder.new(config)
-
-config.create_build_directories
-
 @data = []
-
 @dir = "./data"
-
-image_file_types = [".jpg", ".tif", ".jpeg", ".tiff"]
+@cleanup_list = []
+@image_file_types = [".jpg", ".tif", ".jpeg", ".tiff"]
 
 
 def split_pdf(file)
@@ -65,7 +59,6 @@ def add_image(file, is_doc = false)
   @data.push obj
 end
 
-@cleanup_list = []
 def add_to_cleanup_list(img)
   @cleanup_list.push(img)
 end
@@ -73,8 +66,12 @@ end
 def cleanup
 end
 
+
+iiif = IiifS3::Builder.new(opts)
+iiif.create_build_directories
+
 Dir.foreach(@dir) do |file|
-  if image_file_types.include? File.extname(file)
+  if @image_file_types.include? File.extname(file)
     add_image("#{@dir}/#{file}")
   elsif File.extname(file) == ".pdf"
     images = split_pdf(file)
