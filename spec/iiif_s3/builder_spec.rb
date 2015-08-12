@@ -44,6 +44,18 @@ describe IiifS3::Builder do
 
 
 
+  context " when processing data" do
+    it "does not fail with no data" do
+      expect {iiif.process_data}.not_to raise_error
+    end
+    it "does not fail with real data" do
+
+    end
+  end
+
+
+
+
   context "When load_csving CSV files" do
     it "accepts a path" do
       expect{iiif.load_csv('./spec/data/test.csv')}.not_to raise_error()
@@ -59,7 +71,7 @@ describe IiifS3::Builder do
     end
   end
 
-  context "When reading the data" do
+  context "When loading a CSV file" do
     it "saves the data into the @data param" do
       expect(iiif.data).to be_nil
       iiif.load_csv('./spec/data/test.csv')

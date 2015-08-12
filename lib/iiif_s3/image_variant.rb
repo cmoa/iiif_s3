@@ -5,31 +5,59 @@ require 'fileutils'
 module IiifS3
 
   class ImageVariant
-
-    #
-    # @!attribute [r] image
-    # @return [MiniMagick::Image] The image itself
-    attr_reader :image
- 
-    #
-    # @!attribute [r] path
-    # @return [String] the path on disk for this image
-    attr_reader :path
- 
-    #
-    # @!attribute [r] uri
-    # @return [String] The URI for the image data
-    attr_reader :uri
- 
-    #
-    # @!attribute [r] base_path
-    # @return [String] The base URI for the image representation
-    attr_reader :base_path
-
-
-    attr_reader :base_uri, :id
-
     include MiniMagick
+
+    #
+    # <description>
+    #
+    # @param [Hash] data A Image Data object.
+    # @param [<type>] config <description>
+    # @param [<type>] width <description>
+    # @param [<type>] height <description>
+    # 
+    def initialize(data, config, width = nil, height = nil)
+
+      # Validate input data
+      if data["id"].nil? || data["id"].to_s.empty?
+        raise IiifS3::Error::InvalidImageData, "Each image needs an ID" 
+      elsif data["img_path"].nil? || data["img_path"].to_s.empty?
+        raise IiifS3::Error::InvalidImageData, "Each image needs an path." 
+      elsif data["page_number"].nil? || data["page_number"].to_s.empty?
+        raise IiifS3::Error::InvalidImageData, "Each image needs an page number." 
+      elsif not File.exists? data["img_path"]
+        raise IiifS3::Error::InvalidImageData, "there is no image at that path." 
+      end
+
+      # open image
+      begin
+        @image = Image.open(data["img_path"])
+      rescue MiniMagick::Invalid => e
+        raise IiifS3::Error::InvalidImageData, "Cannot read this image file: #{data["img_path"]}. #{e}"
+      end
+
+      resize(width, height)
+      @image.format "jpg"
+
+      @id = "#{config.image_uri(data['id'],data['page_number'])}"
+      @uri =  "#{id}#{filestring}/default.jpg"
+
+      # Create the on-disk version of the file
+      path = "#{config.build_image_location(data["id"],data["page_number"])}#{filestring}"
+      FileUtils::mkdir_p path
+      filename = "#{path}/default.jpg"
+      @image.write filename unless File.exists? filename
+    end
+
+
+    # @!attribute [r] uri
+    # @return [String] The URI for the jpeg image
+    attr_reader :uri
+
+    #
+    # @!attribute [r] id
+    #   @return [String] The URI for the variant.  
+    attr_reader :id
+
 
     # Get the image width
     #
@@ -47,38 +75,28 @@ module IiifS3
       @image.height
     end
 
+    #
+    # Get the MIME Content-Type of the image. 
+    #
+    # @return [String] the MIME Content-Type (typically "image/jpeg")
+    # 
     def mime_type
       @image.mime_type
     end
 
-
-    def initialize(data, config, width = 0, height = 0)
-
-      # open image
-      @image = Image.open(data["img_path"])
-      resize(width, height)
-      @image.format "jpg"
-
-      @path = "#{config.build_image_location(data["id"],data["page_number"])}#{filestring}"
-      @id = "#{config.image_uri(data['id'],data['page_number'])}"
-      @base_uri = "#{id}#{filestring}"
-      @uri =  "#{@base_uri}/default.jpg"
-      FileUtils::mkdir_p path
-      filename = "#{path}/default.jpg"
-      @image.write filename unless File.exists? filename
-      filename
-    end
-
     protected
+
+    def region
+      "full"
+    end
 
     def resize(width, height)
       @image.resize "#{width}x#{height}"
     end
 
     def filestring
-      "/full/#{width},#{height}/0"
+      "/#{region}/#{width},/0"
     end
-
 
   end
 end

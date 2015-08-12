@@ -26,7 +26,7 @@ module IiifS3
     # This will load the data, perform some basic verifications on it, and sort
     # it into proper order.
     #
-    # @param [Array<Hash>, Hash] either a single imagedata hash or an Array of  imagedata hashes.
+    # @param [Array<Hash>, Hash] data Either a single imagedata hash or an Array of  imagedata hashes.
     # 
     # @raise [IiifS3::Error::InvalidImageData] if any of the data does 
     #   not pass the validation checks
@@ -41,29 +41,41 @@ module IiifS3
       @data = data.sort_by {|datum| [datum["id"], datum["page_number"]] }
     end
 
-    
 
-
-
+    #
+    # Take the loaded data and generate all the files.
+    #
+    #
+    # @return [Void]
+    # 
     def process_data
+      return nil if @data.nil? # do nothing without data.
+
       resources = {}
       @data.each do |datum|
         
-        #Generate standard variants
+        #Generate required variants
         datum["full"] = FullImage.new(datum, @config)
         datum["thumbnail"] = Thumbnail.new(datum, @config)
+
+        # Generate other variants
         reference = ImageVariant.new(datum, @config, 600, 600)
         access = ImageVariant.new(datum, @config, 1200, 1200)
 
-        tiles = generate_tiles(datum, @config)
-        tiles.each do |tile|
-          ImageTile.new(datum, @config, tile)
-        end
+        variants = [datum["thumbnail"], reference, access, datum["full"]]
 
-        generate_image_json(datum, @config, [datum["thumbnail"], reference, access, datum["full"]])
+        # Generate Tiles
+        tiles = generate_tiles(datum, @config)
+ 
+        # Generate info.json
+        generate_image_json(datum, @config, variants)
+
+        # Save the image info for the manifest
         resources[datum["id"]] ||= []
         resources[datum["id"]].push datum
       end
+
+      # Generate the manifests
       resources.each do |key, val|
         manifests.push generate_manifest(val, @config) 
       end
@@ -80,7 +92,6 @@ module IiifS3
     end
 
     def generate_tiles(data, config) 
-
       width = data["full"].width
       tile_width = config.tile_width
       height = data["full"].height
@@ -111,7 +122,9 @@ module IiifS3
           end
         end
       end
-      return tiles
+      tiles.each do |tile|
+        ImageTile.new(data, @config, tile)
+      end
     end
 
     def generate_image_json(data, config, variants) 
@@ -124,6 +137,7 @@ module IiifS3
       end
       return info
     end
+
 
     def generate_manifest(data, config)
       m = Manifest.new(data, config)
@@ -150,7 +164,7 @@ module IiifS3
     # @param [String] csv_path Path to the CSV file containing the image data
     #
     # @return [Void]
-    # @TODO Fix this to use the correct data format!
+    # @todo Fix this to use the correct data format!
     # 
     def load_csv(csv_path)
 
