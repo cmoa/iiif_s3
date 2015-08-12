@@ -4,17 +4,28 @@ require 'fileutils'
 
 module IiifS3
 
+  #
+  # Class ImageVariant represents a single image file within a manifest.
+  # 
+  #
+  # @author David Newbury <david.newbury@gmail.com>
+  #
   class ImageVariant
     include MiniMagick
 
     #
-    # <description>
+    # Initializing an ImageVariant will create the actual image file 
+    # on the file system.  
+    # 
+    # To initialize an image, you will need the 
+    # data hash to have an "id", a "image_path", and a "page_number".
     #
     # @param [Hash] data A Image Data object.
-    # @param [<type>] config <description>
-    # @param [<type>] width <description>
-    # @param [<type>] height <description>
-    # 
+    # @param [IiifS3::Config] config The configuration object
+    # @param [Number] width the desired width of this object in pixels
+    # @param [Number] height the desired height of this object in pixels
+    # @raise IiifS3::Error::InvalidImageData
+    #  
     def initialize(data, config, width = nil, height = nil)
 
       # Validate input data
