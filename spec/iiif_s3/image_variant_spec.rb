@@ -3,7 +3,7 @@ require 'spec_helper'
 describe IiifS3::ImageVariant do
   let(:config) {IiifS3::Config.new}
   let(:data) { {
-      "img_path" => "./spec/data/test.jpg",
+      "image_path" => "./spec/data/test.jpg",
       "id" => 1,
       "page_number" => 1
     } }
@@ -28,11 +28,11 @@ describe IiifS3::ImageVariant do
     end
 
     it "raises if the image has an invalid path" do
-      data["img_path"] = "/i/am/not/a/real/path.jpg"
+      data["image_path"] = "/i/am/not/a/real/path.jpg"
       expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
     end
     it "raises if the image is not a valid image file" do
-      data["img_path"] = "./spec/data/test.csv"
+      data["image_path"] = "./spec/data/test.csv"
       expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
     end
 
@@ -41,7 +41,7 @@ describe IiifS3::ImageVariant do
   context "basic data" do
     before(:all) do
       data = {
-        "img_path" => "./spec/data/test.jpg",
+        "image_path" => "./spec/data/test.jpg",
         "id" => 1,
         "page_number" => 1
       }

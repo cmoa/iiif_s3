@@ -31,19 +31,19 @@ module IiifS3
       # Validate input data
       if data["id"].nil? || data["id"].to_s.empty?
         raise IiifS3::Error::InvalidImageData, "Each image needs an ID" 
-      elsif data["img_path"].nil? || data["img_path"].to_s.empty?
+      elsif data["image_path"].nil? || data["image_path"].to_s.empty?
         raise IiifS3::Error::InvalidImageData, "Each image needs an path." 
       elsif data["page_number"].nil? || data["page_number"].to_s.empty?
         raise IiifS3::Error::InvalidImageData, "Each image needs an page number." 
-      elsif not File.exists? data["img_path"]
+      elsif not File.exists? data["image_path"]
         raise IiifS3::Error::InvalidImageData, "there is no image at that path." 
       end
 
       # open image
       begin
-        @image = Image.open(data["img_path"])
+        @image = Image.open(data["image_path"])
       rescue MiniMagick::Invalid => e
-        raise IiifS3::Error::InvalidImageData, "Cannot read this image file: #{data["img_path"]}. #{e}"
+        raise IiifS3::Error::InvalidImageData, "Cannot read this image file: #{data["image_path"]}. #{e}"
       end
 
       resize(width, height)

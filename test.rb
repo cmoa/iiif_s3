@@ -40,7 +40,7 @@ def add_image(file, is_doc = false)
   id = name_parts.join("_")
 
   obj = {
-        "img_path" => "#{file}",
+        "image_path" => "#{file}",
         "id"       => id,
         "label"    => name_parts.join("."),
         "is_master" => page_num == 1,

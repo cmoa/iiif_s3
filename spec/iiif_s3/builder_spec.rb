@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'ostruct'
 
 
 describe IiifS3::Builder do
@@ -42,17 +43,31 @@ describe IiifS3::Builder do
     end
   end
 
-
-
   context " when processing data" do
+    include_context("fake variants")
+    before(:example) do
+
+      @test_data = {
+        "id" => 1,
+        "page_number" => "1",
+        "image_path" => "./spec/data/test.jpg",
+        "is_master" => true
+      }
+      @iiif = IiifS3::Builder.new
+      @iiif.load(@test_data)
+      allow(@iiif).to receive(:generate_tiles) {nil}
+
+      allow(@iiif).to receive(:generate_variants) {@fake_variants}
+
+    end
     it "does not fail with no data" do
       expect {iiif.process_data}.not_to raise_error
     end
-    it "does not fail with real data" do
 
+    it "does not fail with real data" do
+      expect {@iiif.process_data}.not_to raise_error
     end
   end
-
 
 
 
@@ -79,11 +94,11 @@ describe IiifS3::Builder do
     end
     it "removes headers" do
       iiif.load_csv('./spec/data/test.csv')
-      expect(iiif.data[0]['img_path']).to eq('spec/data/test.jpg')        
+      expect(iiif.data[0]['image_path']).to eq('spec/data/test.jpg')        
     end
     it "doesn't remove headers if not present" do
       iiif.load_csv('./spec/data/no_header.csv')
-      expect(iiif.data[0]['img_path']).to eq('spec/data/test.jpg')        
+      expect(iiif.data[0]['image_path']).to eq('spec/data/test.jpg')        
     end
   end
 end

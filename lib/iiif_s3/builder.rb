@@ -54,21 +54,9 @@ module IiifS3
       resources = {}
       @data.each do |datum|
         
-        #Generate required variants
-        datum["full"] = FullImage.new(datum, @config)
-        datum["thumbnail"] = Thumbnail.new(datum, @config)
-
-        # Generate other variants
-        reference = ImageVariant.new(datum, @config, 600, 600)
-        access = ImageVariant.new(datum, @config, 1200, 1200)
-
-        variants = [datum["thumbnail"], reference, access, datum["full"]]
-
-        # Generate Tiles
-        tiles = generate_tiles(datum, @config)
- 
-        # Generate info.json
-        generate_image_json(datum, @config, variants)
+        datum["variants"] = generate_variants(datum, @config)
+        generate_tiles(datum, @config)
+        generate_image_json(datum, @config)
 
         # Save the image info for the manifest
         resources[datum["id"]] ||= []
@@ -91,10 +79,48 @@ module IiifS3
       Dir.mkdir img_dir unless Dir.exists?(img_dir)
     end
 
+
+    #
+    # Load data into the IIIF server from a CSV
+    #
+    # @param [String] csv_path Path to the CSV file containing the image data
+    #
+    # @return [Void]
+    # @todo Fix this to use the correct data format!
+    # 
+    def load_csv(csv_path)
+
+      raise Error::InvalidCSV unless File.exist? csv_path
+      begin
+        vals = CSV.read(csv_path)
+
+      rescue CSV::MalformedCSVError
+        raise Error::InvalidCSV
+      end  
+
+      raise Error::BlankCSV if vals.length == 0
+
+      raise Error::InvalidCSV if vals[0].length != 3
+
+      # remove optional header
+      vals.shift if vals[0][0] == HEADER_VAL
+
+      @data = vals.collect do |data|
+        {
+          "image_path" => data[0],
+          "id"       => data[1],
+          "label"    => data[2]
+        }
+      end
+    end 
+
+
+    protected
+
     def generate_tiles(data, config) 
-      width = data["full"].width
+      width = data["variants"]["full"].width
       tile_width = config.tile_width
-      height = data["full"].height
+      height = data["variants"]["full"].height
       tiles = []
       config.tile_scale_factors.each do |s|
         (0..(height*1.0/(tile_width*s)).floor).each do |tileY|
@@ -127,15 +153,15 @@ module IiifS3
       end
     end
 
-    def generate_image_json(data, config, variants) 
-      info = ImageInfo.new(data["full"].id, variants ,config.tile_width, config.tile_scale_factors)
+    def generate_image_json(data, config) 
+      info = ImageInfo.new(data["variants"]["full"].uri, data['variants'] ,config.tile_width, config.tile_scale_factors)
 
       filename = "#{config.build_image_location(data['id'],data['page_number'])}/info.json"
       puts "writing #{filename}"
       File.open(filename, "w") do |file|
        file.puts info.to_json 
       end
-      return info
+      return info, filename
     end
 
 
@@ -150,46 +176,20 @@ module IiifS3
       File.open(filename, "w") do |file|
          file.puts m.to_jsonld
       end
-      return m
+      return m, filename
     end
 
 
+    def generate_variants(data, config)
+      obj = {
+        "full" => FullImage.new(data, config),
+        "thumbnail" => Thumbnail.new(data, config)
+      }
 
-
-
-
-    #
-    # Load data into the IIIF server from a CSV
-    #
-    # @param [String] csv_path Path to the CSV file containing the image data
-    #
-    # @return [Void]
-    # @todo Fix this to use the correct data format!
-    # 
-    def load_csv(csv_path)
-
-      raise Error::InvalidCSV unless File.exist? csv_path
-      begin
-        vals = CSV.read(csv_path)
-
-      rescue CSV::MalformedCSVError
-        raise Error::InvalidCSV
-      end  
-
-      raise Error::BlankCSV if vals.length == 0
-
-      raise Error::InvalidCSV if vals[0].length != 3
-
-      # remove optional header
-      vals.shift if vals[0][0] == HEADER_VAL
-
-      @data = vals.collect do |data|
-        {
-          "img_path" => data[0],
-          "id"       => data[1],
-          "label"    => data[2]
-        }
+      config.variants.each do |key,image_size|
+        obj[key] = ImageVariant.new(data, config, image_size, image_size)
       end
-    end 
+      return obj
+    end
   end
 end

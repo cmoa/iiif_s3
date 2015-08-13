@@ -3,7 +3,7 @@ module IiifS3
     DEFAULT_URL = "http://localhost:8000"
     DEFAULT_IMAGE_STRING = "images"
     DEFAULT_TILE_WIDTH = 512
-    attr_reader :base_uri, :use_extensions, :output_dir, :prefix, :image_directory_name, :tile_width, :tile_scale_factors
+    attr_reader :base_uri, :use_extensions, :output_dir, :prefix, :image_directory_name, :tile_width, :tile_scale_factors, :variants
     def initialize(opts = {})
 
       @tile_width = opts[:tile_width] || DEFAULT_TILE_WIDTH
@@ -13,6 +13,7 @@ module IiifS3
       @use_extensions = opts[:use_extensions].nil? ? true : opts[:use_extensions]
       @output_dir = opts[:output_dir] || "./build"
       @image_dir = @output_dir
+      @variants = opts[:variants] || { "reference" => 600, "access" => 1200}
       @prefix = opts[:prefix] || ""
       if @prefix.length > 0 && @prefix[0] != "/"
         @prefix = "/#{@prefix}" 

@@ -23,7 +23,7 @@ module IiifS3
 
     def initialize(data,config)
       primary = data.find{|data| data["is_master"]}
-      raise IiifS3::NoMasterError unless primary
+      raise IiifS3::InvalidImageData, "No 'is_master' was found in the image data." unless primary
 
       @data = Hash.new
       @data["@context"] = PRESENTATION_CONTEXT
@@ -35,7 +35,7 @@ module IiifS3
 
       # @data["metadata"] = data["metadata"] || {}
       # @data["description"] = data["description"]
-      @data["thumbnail"] = primary["thumbnail"].uri
+      @data["thumbnail"] = primary["variants"]["thumbnail"].uri
 
       # @data["license"]     = "http://www.example.org/license.html"
       # @data["attribution"] = "Provided by Example Organization"
@@ -69,9 +69,9 @@ module IiifS3
         "@type" => CANVAS_TYPE,
         "@id"   => "#{config.base_uri}#{config.prefix}/#{data["id"]}/canvas/#{canvas_name}",
         "label" => canvas_label,
-        "width" => data["full"].width.floor,
-        "height" => data["full"].height.floor,
-        "thumbnail" => data["thumbnail"].uri
+        "width" => data["variants"]["full"].width.floor,
+        "height" => data["variants"]["full"].height.floor,
+        "thumbnail" => data["variants"]["thumbnail"].uri
       }
       obj["images"] = [build_image(data, config, obj)]
 
@@ -89,16 +89,16 @@ module IiifS3
         "@type" => ANNOTATION_TYPE,
         "motivation" => MOTIVATION,
         "resource" => {
-          "@id" => data["full"].uri,
+          "@id" => data["variants"]["full"].uri,
           "@type" => IMAGE_TYPE,
-          "format" => data["full"].mime_type,
+          "format" => data["variants"]["full"].mime_type,
           "service" => {
             "@context" => IiifS3::IMAGE_CONTEXT,
-            "@id" => "#{data["full"].id}",
+            "@id" => data["variants"]["full"].id,
             "profile" => IiifS3::LEVEL_0,
           },
-          "width" => data["full"].width,
-          "height" => data["full"].height,
+          "width" => data["variants"]["full"].width,
+          "height" => data["variants"]["full"].height,
         },
         "on" => canvas["@id"]
       }

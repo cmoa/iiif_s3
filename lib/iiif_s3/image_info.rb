@@ -12,8 +12,12 @@ module IiifS3
 
 
       def initialize(uri, variants, tile_width= nil, tile_scale_factors = nil)
+
+        raise IiifS3::Error::InvalidImageData unless variants["full"]
+        raise IiifS3::Error::InvalidImageData unless variants["thumbnail"]
+
         @id = uri
-        full = variants.sort_by { |val| val.width }.last
+        full = variants["full"]
         @variants = variants
         @width = full.width
         @height = full.height
@@ -22,8 +26,8 @@ module IiifS3
       end
 
       def sizes
-         @variants.collect do |size|
-          {"width" => size.width, "height" => size.height}
+         @variants.collect do |name,obj|
+          {"width" => obj.width, "height" => obj.height}
         end
       end
 

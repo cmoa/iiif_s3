@@ -8,3 +8,5 @@
 * [ ] Add in auto-load of paths?
 * [ ] Think about directory structure
 * [ ] Add in preview system
+* [ ] Implement NoMaster check
+* [ ] Implement test for image data without master
