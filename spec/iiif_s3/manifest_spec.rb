@@ -1,14 +1,10 @@
 # require 'spec_helper'
 
 # describe IiifS3::Manifest do
-#   let (:data) {
-#     JSON.parse '{
-#       "id": 1,
-#       "label": "This is a test image"
-#     }'
-#   }
+#   include_context("fake data")
+
 #   let (:config) {IiifS3::Config.new()}
-#   let (:m) {IiifS3::Manifest.new(data,config)}
+#   let (:m) {IiifS3::Manifest.new(@fake_data,config)}
 #   let (:output) {JSON.parse(m.to_jsonld)}
 
 #   it "is initialized with an array" do

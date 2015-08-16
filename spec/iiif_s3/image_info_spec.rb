@@ -3,27 +3,6 @@ require 'ostruct'
 
 include IiifS3
 
-sample_json = %{{
-  "@context": "http://iiif.io/api/image/2/context.json",
-  "@id": "http://www.example.com/test/1",
-  "protocol": "http://iiif.io/api/image",
-  "width": 1000,
-  "height": 1200,
-  "sizes": [
-    {
-      "width": 1000,
-      "height": 1200
-    },
-    {
-      "width": 100,
-      "height": 120
-    }
-  ],
-  "profile": [
-    "http://iiif.io/api/image/2/level0.json"
-  ]
-}}
-
 describe IiifS3::ImageInfo do
 
   let(:uri) {"http://www.example.com/test/1"}
@@ -72,7 +51,7 @@ describe IiifS3::ImageInfo do
     end
 
     it "generates correct JSON" do
-      expect(@info.to_json).to eq(sample_json)
+      expect(@info.to_json).to eq(@fake_image_info)
     end
   end
 end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 
-describe IiifS3::Builder do
+describe IiifS3::Config do
   context "comparing" do
     it "shows equal things to be equal" do
       expect(IiifS3::Config.new).to eq(IiifS3::Config.new)

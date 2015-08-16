@@ -13,8 +13,9 @@ module IiifS3
 
       def initialize(uri, variants, tile_width= nil, tile_scale_factors = nil)
 
-        raise IiifS3::Error::InvalidImageData unless variants["full"]
-        raise IiifS3::Error::InvalidImageData unless variants["thumbnail"]
+        raise IiifS3::Error::InvalidImageData, "No full variant provided:  variants: #{variants}" unless variants["full"]
+        raise IiifS3::Error::InvalidImageData, "No thumbnail variant provided:  variants: #{variants}" unless variants["thumbnail"]
+        raise IiifS3::Error::InvalidImageData, "No URI was provided for this image!" if uri.nil?
 
         @id = uri
         full = variants["full"]

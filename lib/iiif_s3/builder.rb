@@ -36,7 +36,10 @@ module IiifS3
     def load(data)
       data = [data].flatten # handle hashes and arrays of hashes
 
-      data.each {|datum| raise IiifS3::Error::InvalidImageData if datum["id"].nil? || datum["page_number"].nil? }
+      # validate
+      data.each  do |datum| 
+        raise IiifS3::Error::InvalidImageData if datum["id"].nil? || datum["page_number"].nil?
+      end
 
       @data = data.sort_by {|datum| [datum["id"], datum["page_number"]] }
     end
@@ -154,7 +157,7 @@ module IiifS3
     end
 
     def generate_image_json(data, config) 
-      info = ImageInfo.new(data["variants"]["full"].uri, data['variants'] ,config.tile_width, config.tile_scale_factors)
+      info = ImageInfo.new(data["variants"]["full"].id, data['variants'] ,config.tile_width, config.tile_scale_factors)
 
       filename = "#{config.build_image_location(data['id'],data['page_number'])}/info.json"
       puts "writing #{filename}"

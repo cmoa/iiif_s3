@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'ostruct'
 
 
 describe IiifS3::Builder do
@@ -45,18 +44,11 @@ describe IiifS3::Builder do
 
   context " when processing data" do
     include_context("fake variants")
+    include_context("fake data")
     before(:example) do
-
-      @test_data = {
-        "id" => 1,
-        "page_number" => "1",
-        "image_path" => "./spec/data/test.jpg",
-        "is_master" => true
-      }
       @iiif = IiifS3::Builder.new
-      @iiif.load(@test_data)
+      @iiif.load(@fake_data)
       allow(@iiif).to receive(:generate_tiles) {nil}
-
       allow(@iiif).to receive(:generate_variants) {@fake_variants}
 
     end
@@ -67,8 +59,13 @@ describe IiifS3::Builder do
     it "does not fail with real data" do
       expect {@iiif.process_data}.not_to raise_error
     end
+  
+    it " passes the Temporary Manifest Check" do
+      @iiif.process_data
+      expect(@iiif.manifests.count).to eq 1
+      expect(@iiif.manifests[0][0].to_jsonld).to eq @fake_manifest
+    end
   end
-
 
 
   context "When load_csving CSV files" do
