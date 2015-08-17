@@ -24,8 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency 'yard'
-
-
+  spec.add_development_dependency 'dotenv'
 
   spec.add_runtime_dependency "commander", "~> 4.3"
   spec.add_runtime_dependency "aws-sdk", "~> 2.1"

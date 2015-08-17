@@ -13,7 +13,10 @@ module IiifS3
     # Class InvalidCSV indicates that there is something wrong with the provided Image Data.
     class InvalidImageData < StandardError; end
 
-    # Class NoMasterError indicates that all of the images in a collection are secondary images..
+    # Class NoMasterError indicates that all of the images in a collection are secondary images.
     class NoMasterError < StandardError; end
+
+    # Class BadAmazonCredentials indicates that something was wrong with the Amazon login information.
+    class BadAmazonCredentials < StandardError; end
   end
 end

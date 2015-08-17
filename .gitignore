@@ -21,6 +21,8 @@ tmp
 *.a
 mkmf.log
 
+.env
+
 build/*
 data/*
 

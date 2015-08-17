@@ -2,7 +2,7 @@ require 'spec_helper'
 
 
 describe IiifS3::Builder do
-  let (:iiif) { IiifS3::Builder.new }
+  let (:iiif) { IiifS3::Builder.new() }
   let (:test_object_0) {{"id" => 1, "page_number" => 1}}
   let (:test_object_1) {{"id" => 2, "page_number" => 1}}
   let (:test_object_2) {{"id" => 2, "page_number" => 2}}
@@ -46,7 +46,7 @@ describe IiifS3::Builder do
     include_context("fake variants")
     include_context("fake data")
     before(:example) do
-      @iiif = IiifS3::Builder.new
+      @iiif = IiifS3::Builder.new({base_uri: 'http://localhost:8000'})
       @iiif.load(@fake_data)
       allow(@iiif).to receive(:generate_tiles) {nil}
       allow(@iiif).to receive(:generate_variants) {@fake_variants}

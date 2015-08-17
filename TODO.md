@@ -10,3 +10,5 @@
 * [ ] Add in preview system
 * [ ] Implement NoMaster check
 * [ ] Implement test for image data without master
+* [ ] Acutally delete temp files
+* [ ] Look into bucket existance check for s3

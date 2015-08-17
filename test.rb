@@ -1,3 +1,7 @@
+require 'dotenv'
+
+Dotenv.load
+
 require 'rmagick'
 require_relative 'lib/iiif_s3'
 opts = {}

@@ -164,6 +164,7 @@ module IiifS3
       File.open(filename, "w") do |file|
        file.puts info.to_json 
       end
+      config.add_file_to_s3(filename)
       return info, filename
     end
 
@@ -179,6 +180,7 @@ module IiifS3
       File.open(filename, "w") do |file|
          file.puts m.to_jsonld
       end
+      config.add_file_to_s3(filename)
       return m, filename
     end
 

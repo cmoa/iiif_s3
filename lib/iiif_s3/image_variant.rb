@@ -57,6 +57,7 @@ module IiifS3
       FileUtils::mkdir_p path
       filename = "#{path}/default.jpg"
       @image.write filename unless File.exists? filename
+      config.add_file_to_s3(filename)
     end
 
 
