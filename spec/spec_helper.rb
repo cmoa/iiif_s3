@@ -4,3 +4,5 @@ require 'iiif_s3'
 require 'dotenv'
 
 Dotenv.load
+
+$INTERNET = false

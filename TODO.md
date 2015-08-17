@@ -12,3 +12,4 @@
 * [ ] Implement test for image data without master
 * [ ] Acutally delete temp files
 * [ ] Look into bucket existance check for s3
+* [ ] Add explicit tests for internet-enabled configs

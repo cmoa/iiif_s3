@@ -1,7 +1,17 @@
 require 'spec_helper'
-
+require 'ostruct'
 
 describe IiifS3::Builder do
+  # before(:each) do
+  #   fake_aws_bucket = OpenStruct.new({
+  #     "exists?" => "true"
+  #   })
+  #   unless $INTERNET
+  #     allow(Aws::S3::Bucket).to receive(:new) {nil}
+  #     allow(Aws::S3::Bucket).to receive(:exists?) {true}
+  #   end
+  # end
+
   let (:iiif) { IiifS3::Builder.new() }
   let (:test_object_0) {{"id" => 1, "page_number" => 1}}
   let (:test_object_1) {{"id" => 2, "page_number" => 1}}

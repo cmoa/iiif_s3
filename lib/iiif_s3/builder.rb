@@ -3,11 +3,24 @@ module IiifS3
 
 
   class Builder
+    
+    
     HEADER_VAL = 'filename'
-    attr_reader :data, :manifests, :config
-
+    
+    #
+    # @!attribute [r] data
+    #   @return [Array<Hash>] The raw data computed for the given set of images
+    attr_reader :data
 
     #
+    # @!attribute [r] manifests
+    #   @return [Array<Hash>] The manifest hashes for this configuration
+    attr_reader :manifests
+
+    # @!attribute [r] config
+    #   @return [IiifS3::Config] The configuration object
+    attr_reader :config
+
     # Initialize the builder.
     #
     # @param [Hash] config an optional configuration object.
