@@ -67,7 +67,9 @@ module IiifS3
       end
 
       def profile
-        [IiifS3::LEVEL_0]
+        [IiifS3::LEVEL_0,{
+          supports: ["cors","sizeByWhListed"]
+        }]
       end
 
       # TODO:  Implement this.  See <http://iiif.io/api/annex/services/#physical-dimensions>

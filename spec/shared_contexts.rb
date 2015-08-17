@@ -21,7 +21,13 @@ RSpec.shared_context "fake variants" do
     }
   ],
   "profile": [
-    "http://iiif.io/api/image/2/level0.json"
+    "http://iiif.io/api/image/2/level0.json",
+    {
+      "supports": [
+        "cors",
+        "sizeByWhListed"
+      ]
+    }
   ]
 }'
   end
