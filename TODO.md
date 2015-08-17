@@ -4,6 +4,7 @@
 * [X] Make the project respect the .json/no .json config
 * [X] Stub out file writing for the tests
 * [X] Document the configuration object
+* [X] Actually delete temp files
 
 * [ ] Generate intermediate json files for the sub-components
 * [ ] Figure out how to optimize the image writing
@@ -12,7 +13,6 @@
 * [ ] Add in preview system
 * [ ] Implement NoMaster check
 * [ ] Implement test for image data without master
-* [ ] Acutally delete temp files
 * [ ] Look into bucket existance check for s3
 * [ ] Add explicit tests for internet-enabled configs
 * [ ] Add in redirect for w,h to w,

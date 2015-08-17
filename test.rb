@@ -9,7 +9,7 @@ opts = {}
 opts[:image_directory_name] = "img"
 opts[:output_dir] = "/Users/david/Documents/opensource/mirador"
 opts[:variants] = { "reference" => 600, "access" => 1200}
-opts[:upload_to_s3] = true
+opts[:upload_to_s3] = false
 
 @data = []
 @dir = "./data"
@@ -51,7 +51,8 @@ def add_image(file, is_doc = false)
         "label"    => name_parts.join("."),
         "is_master" => page_num == 1,
         "page_number" => page_num,
-        "is_document" => false
+        "is_document" => false,
+        "description" => "This is a test file generated as part of the development on the ruby IiifS3 Gem. <b> This should be bold.</b>"
     }
 
   if is_paged
@@ -70,6 +71,9 @@ def add_to_cleanup_list(img)
 end
 
 def cleanup
+  @cleanup_list.each do |file|
+    File.delete(file)
+  end
 end
 
 
