@@ -1,14 +1,13 @@
 * [X] Add in "cors" as a feature
 * [X] Add in "sizeByWhListed" as a feature
 * [X] Add PDF support
+* [X] Make the project respect the .json/no .json config
+* [X] Stub out file writing for the tests
+* [X] Document the configuration object
 
 * [ ] Generate intermediate json files for the sub-components
-* [ ] Make the project respect the .json/no .json config
-* [ ] Document the configuration object
-* [ ] Stub out file writing for the tests
 * [ ] Figure out how to optimize the image writing
 * [ ] Add in the ability to skip generated directories (with override)
-* [ ] Add in auto-load of paths?
 * [ ] Think about directory structure
 * [ ] Add in preview system
 * [ ] Implement NoMaster check

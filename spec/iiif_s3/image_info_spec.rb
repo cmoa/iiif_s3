@@ -24,8 +24,8 @@ describe IiifS3::ImageInfo do
     end
   end
 
-  context "valid data" do
 
+  context "valid data" do
     before(:example) do 
       @info = ImageInfo.new(uri,@fake_variants)
     end  

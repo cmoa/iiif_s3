@@ -34,8 +34,8 @@ module IiifS3
 
 
       # @data["metadata"] = data["metadata"] || {}
-      # @data["description"] = data["description"]
-      @data["thumbnail"] = primary["variants"]["thumbnail"].uri
+      @data["description"] = primary["description"] unless primary["description"].nil?
+      @data["thumbnail"]   = primary["variants"]["thumbnail"].uri
 
       # @data["license"]     = "http://www.example.org/license.html"
       # @data["attribution"] = "Provided by Example Organization"
