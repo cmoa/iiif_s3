@@ -184,17 +184,8 @@ module IiifS3
 
     def generate_manifest(data, config)
       m = Manifest.new(data, config)
-      path = config.build_location(data.first["id"])
-      FileUtils::mkdir_p path unless Dir.exists? path
-
-      filename = "#{path}/manifest.json"
-      puts "writing #{filename}"
-
-      File.open(filename, "w") do |file|
-         file.puts m.to_jsonld
-      end
-      config.add_file_to_s3(filename)
-      return m, filename
+      m.save_to_disk
+      return m
     end
 
 

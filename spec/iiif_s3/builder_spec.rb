@@ -73,7 +73,7 @@ describe IiifS3::Builder do
     it " passes the Temporary Manifest Check" do
       @iiif.process_data
       expect(@iiif.manifests.count).to eq 1
-      expect(@iiif.manifests[0][0].to_jsonld).to eq @fake_manifest
+      expect(@iiif.manifests.first.to_jsonld).to eq @fake_manifest
     end
   end
 

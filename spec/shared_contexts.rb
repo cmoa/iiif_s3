@@ -54,11 +54,12 @@ RSpec.shared_context "fake data" do
   "viewingHint": "individuals",
   "sequences": [
     {
+      "@id": "http://localhost:8000/1/sequence/default.json",
       "@type": "sc:Sequence",
       "canvases": [
         {
           "@type": "sc:Canvas",
-          "@id": "http://localhost:8000/1/canvas/front",
+          "@id": "http://localhost:8000/1/canvas/front.json",
           "label": "front",
           "width": 2000,
           "height": 2400,
@@ -66,6 +67,7 @@ RSpec.shared_context "fake data" do
           "images": [
             {
               "@type": "oa:Annotation",
+              "@id": "http://localhost:8000/1/annotation/front.json",
               "motivation": "sc:painting",
               "resource": {
                 "@id": null,
@@ -79,7 +81,7 @@ RSpec.shared_context "fake data" do
                 "width": 1000,
                 "height": 1200
               },
-              "on": "http://localhost:8000/1/canvas/front"
+              "on": "http://localhost:8000/1/canvas/front.json"
             }
           ]
         }
