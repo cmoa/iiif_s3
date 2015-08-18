@@ -60,7 +60,7 @@ module IiifS3
 
     def initialize(opts = {})
 
-      @upload_to_s3 = false unless !opts[:upload_to_s3].nil? && opts[:upload_to_s3] == true
+      @upload_to_s3 = opts[:upload_to_s3] || false
       @s3 = IiifS3::AmazonS3.new if @upload_to_s3
       @tile_width = opts[:tile_width] || DEFAULT_TILE_WIDTH
       @tile_scale_factors = opts[:tile_scale_factors] || DEFAULT_TILE_SCALE_FACTORS
@@ -90,6 +90,20 @@ module IiifS3
 
     def image_uri(id, page_number)
       "#{base_uri}#{prefix}/#{image_directory_name}/#{id}-#{page_number}"
+    end
+
+    def add_default_redirect(filename) 
+      return unless  @upload_to_s3
+      key = filename.gsub(output_dir,"")
+      key = key[1..-1] if key[0] == "/"
+
+      name_key = key.split(".")[0..-2].join(".")
+
+      unless key == name_key
+        key = "#{@base_uri}/#{key}"
+        puts "adding redirect from #{name_key} to #{key}"
+        @s3.add_redirect(name_key, key)
+      end
     end
 
     def add_file_to_s3(filename)

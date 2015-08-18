@@ -1,22 +1,18 @@
 module IiifS3
+
+
+  #
+  # Class Manifest is an abstraction over the IIIF Manifest, and by extension over the
+  # entire Presentation API.  It takes the internal representation of data and converts
+  # it into a collection of JSON-LD documents.  Optionally, it also provides the ability
+  # to save these files to disk and upload them to Amazon S3.
+  #
+  # @author David Newbury <david.newbury@gmail.com>
+  #
   class Manifest
     include IiifS3
 
 
-    #--------------------------------------------------------------------------
-    # CONSTANTS
-    #--------------------------------------------------------------------------
-
-    MANIFEST_TYPE             = "sc:Manifest"
-    SEQUENCE_TYPE             = "sc:Sequence"
-    CANVAS_TYPE               = "sc:Canvas"
-    ANNOTATION_TYPE           = "oa:Annotation"
-    IMAGE_TYPE                = "dcterms:Image"
-    MOTIVATION                = "sc:painting"
-    DEFAULT_CANVAS_LABEL      = "front"
-    DEFAULT_SEQUENCE_NAME     = "default"
-    DEFAULT_VIEWING_DIRECTION = "left-to-right"
-    MIN_CANVAS_SIZE           = 1200
 
     #--------------------------------------------------------------------------
     # CONSTRUCTOR
@@ -27,11 +23,14 @@ module IiifS3
       @primary = data.find{|data| data["is_master"]}
       raise IiifS3::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
 
+
+      id = "#{config.base_uri}/#{@primary['id']}/manifest"
+      id += ".json" if config.use_extensions
+
       @data = Hash.new
       @data["@context"] = PRESENTATION_CONTEXT
       @data["@type"] = MANIFEST_TYPE
-      @data["@id"] = "#{config.base_uri}/#{@primary['id']}/manifest"
-      @data["@id"] += ".json" if config.use_extensions
+      @data["@id"] = URI.escape(id)
       @data["label"] = @primary["label"] || ""
 
 
@@ -52,10 +51,23 @@ module IiifS3
       # @data[related] = 
     end
 
-    def to_jsonld
+    #
+    #
+    # @return [String]  the JSON-LD representation of the manifest as a string.
+    # 
+    def to_json
       return JSON.pretty_generate @data
     end
 
+    #
+    # Save the manifest and all sub-resources to disk, using the
+    # paths contained withing the IiifS3::Config object passed at 
+    # initialization.
+    # 
+    # Will create the manifest, sequences, canvases, and annotation subobjects.
+    #
+    # @return [Void] 
+    # 
     def save_to_disk
       data = @data
       save_subfile(@data)
@@ -68,9 +80,11 @@ module IiifS3
           end
         end
       end
+      return nil
     end
 
     protected
+
 
     #--------------------------------------------------------------------------
     def build_sequence(data,opts = {name: DEFAULT_SEQUENCE_NAME}) 
@@ -79,7 +93,7 @@ module IiifS3
       id += ".json" if @config.use_extensions
 
       opts.merge({
-        "@id" => id,
+        "@id" => URI.escape(id),
         "@type" => SEQUENCE_TYPE,
         "canvases" => data.collect {|datum| build_canvas(datum)}
       })
@@ -96,7 +110,7 @@ module IiifS3
 
       obj = {
         "@type" => CANVAS_TYPE,
-        "@id"   => id,
+        "@id"   => URI.escape(id),
         "label" => canvas_label,
         "width" => data["variants"]["full"].width.floor,
         "height" => data["variants"]["full"].height.floor,
@@ -115,10 +129,10 @@ module IiifS3
     #--------------------------------------------------------------------------
     def build_image(data, canvas)
       name = canvas['@id'].split("/").last
-      id = "#{@config.base_uri}#{@config.prefix}/#{data["id"]}/annotation/#{name}"
+      id =  "#{@config.base_uri}#{@config.prefix}/#{data["id"]}/annotation/#{name}"
       {
         "@type" => ANNOTATION_TYPE,
-        "@id"   => id,
+        "@id"   => URI.escape(id),
         "motivation" => MOTIVATION,
         "resource" => {
           "@id" => data["variants"]["full"].uri,
@@ -152,6 +166,5 @@ module IiifS3
       end
       @config.add_file_to_s3(path)
     end
-
   end
 end

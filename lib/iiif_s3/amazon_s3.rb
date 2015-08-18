@@ -16,7 +16,8 @@ module IiifS3
     # and AWS_REGION), verify that the bucket exists, and then connect to
     # that bucket.
     # 
-    # It will also set the CORS rules to allow cross-domain access to that bucket.
+    # It will also set the CORS rules to allow cross-domain access to that bucket, as well
+    # as configuring the bucket as a website.
     #
     # @return [Void]
     # 
@@ -36,7 +37,8 @@ module IiifS3
         raise IiifS3::Error::BadAmazonCredentials, "The bucket name in ENV['AWS_BUCKET_NAME'] does not exist.  You supplied '#{ENV['AWS_BUCKET_NAME']}'" 
       end
       @bucket.cors.put(cors_rules)
-      return void
+      @bucket.website.put(website_rules)
+      return nil
     end
 
     #
@@ -64,6 +66,7 @@ module IiifS3
       }
       obj.merge!(options)
 
+      puts "uploading #{filename} to #{key}"
       File.open(filename,'rb') do |source_file|
         obj[:body] = source_file
         bucket.put_object(obj)
@@ -102,8 +105,30 @@ module IiifS3
       upload_file(key, filename, obj)
     end
 
+    def add_redirect(key, redirect_key) 
+       obj = {
+          acl: "public-read",
+          key: key,
+          website_redirect_location: redirect_key
+        }
+      bucket.put_object(obj)
+    end
+
     protected
 
+    def website_rules
+      {
+        website_configuration: { # required
+          error_document: {
+            key: "error.html", # required
+          },
+          index_document: {
+            suffix: "index.html", # required
+          }
+        }
+      }
+    end
+    
     def cors_rules
       {
         cors_configuration: {

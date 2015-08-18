@@ -177,6 +177,7 @@ module IiifS3
       File.open(filename, "w") do |file|
        file.puts info.to_json 
       end
+      config.add_default_redirect(filename)
       config.add_file_to_s3(filename)
       return info, filename
     end

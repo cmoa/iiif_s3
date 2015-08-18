@@ -16,6 +16,12 @@ require "iiif_s3/amazon_s3"
 
 module IiifS3
 
+
+  #--------------------------------------------------------------------------
+  # CONSTANTS
+  #--------------------------------------------------------------------------
+
+
   # @return [String] The URI of the presentation context for the IIIF V.2
   PRESENTATION_CONTEXT  = "http://iiif.io/api/presentation/2/context.json"
   # @return [String] The URI of the image context for the IIIF V.2
@@ -24,8 +30,34 @@ module IiifS3
   IMAGE_PROTOCOL        = "http://iiif.io/api/image"
   # @return [String] The URI of the Level 0 profile for the IIIF V.2
   LEVEL_0               = "http://iiif.io/api/image/2/level0.json"
-
+  # @return [String] The IIIF default type for a manifest.
+  MANIFEST_TYPE             = "sc:Manifest"
+  # @return [String]  The IIIF default type for a sequence.
+  SEQUENCE_TYPE             = "sc:Sequence"
+  # @return [String]  The IIIF default type for a canvas
+  CANVAS_TYPE               = "sc:Canvas"
+  # @return [String]  The IIIF default type for a annotation.
+  ANNOTATION_TYPE           = "oa:Annotation"
+  # @return [String]  The IIIF default type for an image.
+  IMAGE_TYPE                = "dcterms:Image"
+  # @return [String] The default label for a canvas without a specified name.
+  MOTIVATION                = "sc:painting"
+  # @return [String] The default label for a canvas without a specified name.
+  DEFAULT_CANVAS_LABEL      = "front"
+  # @return [String] The default name for a sequence without a specified name.
+  DEFAULT_SEQUENCE_NAME     = "default"
+  # @return [String] The default reading direction for this manifest.
+  DEFAULT_VIEWING_DIRECTION = "left-to-right"
+  # @return [Number] The size in pixels below which the canvas will be doubled.
+  MIN_CANVAS_SIZE           = 1200
   
+
+    #--------------------------------------------------------------------------
+    # HELPERS
+    #--------------------------------------------------------------------------
+
+
+
   # Validates a viewing direction string against the IIIF V.2 spec.
   #
   # According to v2 of the IIIF standards, there are only four valid viewing directions:

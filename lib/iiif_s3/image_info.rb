@@ -45,7 +45,7 @@ module IiifS3
       def to_json
         obj = {
           "@context" => context,
-          "@id" => id,
+          "@id" => URI.escape(id),
           "protocol" => protocol,
           "width" => width,
           "height" => height,
@@ -68,7 +68,7 @@ module IiifS3
 
       def profile
         [IiifS3::LEVEL_0,{
-          supports: ["cors","sizeByWhListed"]
+          supports: ["cors","sizeByWhListed", "baseUriRedirect"]
         }]
       end
 

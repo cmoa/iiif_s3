@@ -5,15 +5,15 @@ describe IiifS3::Manifest do
 
   let (:config) {IiifS3::Config.new()}
   let (:m) {IiifS3::Manifest.new([@fake_data],config)}
-  let (:output) {JSON.parse(m.to_jsonld)}
+  let (:output) {JSON.parse(m.to_json)}
 
   it "initializes without an error" do
     expect(m).to be_a(IiifS3::Manifest)    
   end
 
   it "exports JSON-LD as a valid JSON string" do
-    expect(m.to_jsonld).to be_a(String)
-    expect{JSON.parse(m.to_jsonld)}.not_to raise_error
+    expect(m.to_json).to be_a(String)
+    expect{JSON.parse(m.to_json)}.not_to raise_error
   end
 
   it "has a @context" do
@@ -61,7 +61,7 @@ describe IiifS3::Manifest do
       new_data = @fake_data
       new_data["viewingDirection"] = dir
       m = IiifS3::Manifest.new([new_data],config)
-      o = JSON.parse(m.to_jsonld)
+      o = JSON.parse(m.to_json)
       expect(o["viewingDirection"]).to eq(dir)
 
     end
@@ -71,7 +71,7 @@ describe IiifS3::Manifest do
       new_data = @fake_data
       new_data["viewingDirection"] = dir
       m = IiifS3::Manifest.new([new_data],config)
-      o = JSON.parse(m.to_jsonld)
+      o = JSON.parse(m.to_json)
       expect(o["viewingDirection"]).to eq IiifS3::Manifest::DEFAULT_VIEWING_DIRECTION
     end
   end

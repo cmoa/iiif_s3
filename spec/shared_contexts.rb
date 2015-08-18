@@ -25,7 +25,8 @@ RSpec.shared_context "fake variants" do
     {
       "supports": [
         "cors",
-        "sizeByWhListed"
+        "sizeByWhListed",
+        "baseUriRedirect"
       ]
     }
   ]

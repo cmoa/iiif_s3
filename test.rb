@@ -9,7 +9,7 @@ opts = {}
 opts[:image_directory_name] = "img"
 opts[:output_dir] = "/Users/david/Documents/opensource/mirador"
 opts[:variants] = { "reference" => 600, "access" => 1200}
-opts[:upload_to_s3] = false
+opts[:upload_to_s3] = true
 
 @data = []
 @dir = "./data"
