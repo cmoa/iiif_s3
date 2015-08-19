@@ -4,7 +4,6 @@ module IiifS3
 
   class Builder
     
-    
     HEADER_VAL = 'filename'
     
     #
@@ -83,6 +82,11 @@ module IiifS3
       resources.each do |key, val|
         manifests.push generate_manifest(val, @config) 
       end
+
+      # Generate the collection
+      collection = Collection.new("Test Data",@config)
+      manifests.each{|m| collection.add_manifest(m)}
+      collection.save
     end    
 
     # Creates the required directories for exporting to the file system.
@@ -185,7 +189,7 @@ module IiifS3
 
     def generate_manifest(data, config)
       m = Manifest.new(data, config)
-      m.save_to_disk
+      m.save_all_files_to_disk
       return m
     end
 

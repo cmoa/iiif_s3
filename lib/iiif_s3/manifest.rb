@@ -20,31 +20,16 @@ module IiifS3
     # CONSTRUCTOR
     #--------------------------------------------------------------------------
 
-    def initialize(data,config)
+    def initialize(data,config, opts = {})
       @config = config
       @primary = data.find{|data| data["is_master"]}
       raise IiifS3::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
 
-
       self.id = "#{config.base_uri}/#{@primary['id']}/manifest"
-      self.label = @primary["label"] || ""
-      self.description = @primary["description"]
-      @data = base_properties
+      self.label = opts[:label] || @primary["label"] || ""
+      self.description =  opts[:description] || @primary["description"]
 
-      @data["thumbnail"]   = @primary["variants"]["thumbnail"].uri
-
-      # @data["metadata"] = data["metadata"] || {}
-      # @data["license"]     = "http://www.example.org/license.html"
-      # @data["attribution"] = "Provided by Example Organization"
-      # @data["logo"]        = "http://www.example.org/logos/institution1.jpg"
-
-      @data["viewingDirection"] = DEFAULT_VIEWING_DIRECTION
-      @data["viewingDirection"] = @primary["viewingDirection"] if IiifS3.is_valid_viewing_direction(@primary["viewingDirection"]) 
-      @data["viewingHint"] = @primary["is_document"] ? "paged" : "individuals"
-
-      @data["sequences"] = [build_sequence(data)]
-
-      # @data[related] = 
+      @sequences = build_sequence(data)
     end
 
     #
@@ -52,7 +37,18 @@ module IiifS3
     # @return [String]  the JSON-LD representation of the manifest as a string.
     # 
     def to_json
-      return JSON.pretty_generate @data
+      obj = base_properties
+
+      obj["thumbnail"]   = @primary["variants"]["thumbnail"].uri
+
+     
+
+      obj["viewingDirection"] = DEFAULT_VIEWING_DIRECTION
+      obj["viewingDirection"] = @primary["viewingDirection"] if IiifS3.is_valid_viewing_direction(@primary["viewingDirection"]) 
+      obj["viewingHint"] = @primary["is_document"] ? "paged" : "individuals"
+      obj["sequences"] = [@sequences]
+
+      return JSON.pretty_generate obj
     end
 
     #
@@ -64,15 +60,15 @@ module IiifS3
     #
     # @return [Void] 
     # 
-    def save_to_disk
-      data = @data
-      save_subfile(@data)
-      @data["sequences"].each do |sequence|
-        save_subfile(sequence)
+    def save_all_files_to_disk
+      data = JSON.parse(self.to_json)
+      save_to_disk(data)
+      data["sequences"].each do |sequence|
+        save_to_disk(sequence)
         sequence["canvases"].each do |canvas|
-          save_subfile(canvas)
+          save_to_disk(canvas)
           canvas["images"].each do |annotation|
-            save_subfile(annotation)
+            save_to_disk(annotation)
           end
         end
       end

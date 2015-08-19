@@ -8,6 +8,11 @@ module IiifS3
  
     attr_reader :description
 
+    attr_accessor :metadata
+    attr_accessor :attribution
+    attr_accessor :logo
+    attr_accessor :license
+    attr_accessor :related
 
     def type
       self.class::TYPE
@@ -33,10 +38,14 @@ module IiifS3
       obj
     end
 
+    def save
+      save_to_disk(JSON.parse(self.to_json))
+    end
+
     protected
     #--------------------------------------------------------------------------
-    def save_subfile(data)
-      data = data.clone
+    def save_to_disk(data)
+      #data = data.clone
       path = data['@id'].gsub(@config.base_uri,@config.output_dir)
       path_parts = path.split("/")
       path_parts.pop
