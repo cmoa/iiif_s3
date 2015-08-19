@@ -37,6 +37,21 @@ end
 RSpec.shared_context "fake data" do
   include_context("fake variants")
   before(:example) do
+    
+    @fake_collection = '{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "http://localhost:8000/collection/name.json",
+  "@type": "sc:Collection",
+  "label": "Test Data",
+  "manifests": [
+    {
+      "@id": "http://localhost:8000/1/manifest.json",
+      "@type": "sc:Manifest",
+      "label": "test label"
+    }
+  ]
+}'
+
     @fake_data = {
       "id" => 1,
       "page_number" => "1",
@@ -47,8 +62,8 @@ RSpec.shared_context "fake data" do
     }
     @fake_manifest = '{
   "@context": "http://iiif.io/api/presentation/2/context.json",
-  "@type": "sc:Manifest",
   "@id": "http://localhost:8000/1/manifest.json",
+  "@type": "sc:Manifest",
   "label": "test label",
   "thumbnail": null,
   "viewingDirection": "left-to-right",

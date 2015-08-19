@@ -18,5 +18,8 @@ module IiifS3
 
     # Class BadAmazonCredentials indicates that something was wrong with the Amazon login information.
     class BadAmazonCredentials < StandardError; end
+
+    class MissingCollectionName < StandardError; end
+
   end
 end

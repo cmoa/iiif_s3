@@ -3,9 +3,11 @@ require 'JSON'
 
 require "iiif_s3/version"
 require "iiif_s3/errors"
+require "iiif_s3/base_properties"
 require "iiif_s3/builder"
 require "iiif_s3/manifest"
 require "iiif_s3/config"
+require "iiif_s3/collection"
 require "iiif_s3/image_variant"
 require "iiif_s3/thumbnail"
 require "iiif_s3/image_tile"
@@ -13,9 +15,7 @@ require "iiif_s3/full_image"
 require "iiif_s3/image_info"
 require "iiif_s3/amazon_s3"
 
-
 module IiifS3
-
 
   #--------------------------------------------------------------------------
   # CONSTANTS
@@ -30,8 +30,6 @@ module IiifS3
   IMAGE_PROTOCOL        = "http://iiif.io/api/image"
   # @return [String] The URI of the Level 0 profile for the IIIF V.2
   LEVEL_0               = "http://iiif.io/api/image/2/level0.json"
-  # @return [String] The IIIF default type for a manifest.
-  MANIFEST_TYPE             = "sc:Manifest"
   # @return [String]  The IIIF default type for a sequence.
   SEQUENCE_TYPE             = "sc:Sequence"
   # @return [String]  The IIIF default type for a canvas
@@ -68,7 +66,7 @@ module IiifS3
   #
   # @return [boolean] Is the provided string a valid viewing direction?
   # 
-  def is_valid_viewing_direction(direction)
+  def self.is_valid_viewing_direction(direction)
     direction == "left-to-right" ||
     direction == "top-to-bottom" ||
     direction == "bottom-to-top" ||

@@ -10,9 +10,11 @@ module IiifS3
   # @author David Newbury <david.newbury@gmail.com>
   #
   class Manifest
-    include IiifS3
 
+    # @return [String] The IIIF default type for a manifest.
+    TYPE = "sc:Manifest"
 
+    include BaseProperties
 
     #--------------------------------------------------------------------------
     # CONSTRUCTOR
@@ -24,26 +26,20 @@ module IiifS3
       raise IiifS3::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
 
 
-      id = "#{config.base_uri}/#{@primary['id']}/manifest"
-      id += ".json" if config.use_extensions
+      self.id = "#{config.base_uri}/#{@primary['id']}/manifest"
+      self.label = @primary["label"] || ""
+      self.description = @primary["description"]
+      @data = base_properties
 
-      @data = Hash.new
-      @data["@context"] = PRESENTATION_CONTEXT
-      @data["@type"] = MANIFEST_TYPE
-      @data["@id"] = URI.escape(id)
-      @data["label"] = @primary["label"] || ""
-
-
-      # @data["metadata"] = data["metadata"] || {}
-      @data["description"] = @primary["description"] unless @primary["description"].nil?
       @data["thumbnail"]   = @primary["variants"]["thumbnail"].uri
 
+      # @data["metadata"] = data["metadata"] || {}
       # @data["license"]     = "http://www.example.org/license.html"
       # @data["attribution"] = "Provided by Example Organization"
       # @data["logo"]        = "http://www.example.org/logos/institution1.jpg"
 
       @data["viewingDirection"] = DEFAULT_VIEWING_DIRECTION
-      @data["viewingDirection"] = @primary["viewingDirection"] if is_valid_viewing_direction(@primary["viewingDirection"]) 
+      @data["viewingDirection"] = @primary["viewingDirection"] if IiifS3.is_valid_viewing_direction(@primary["viewingDirection"]) 
       @data["viewingHint"] = @primary["is_document"] ? "paged" : "individuals"
 
       @data["sequences"] = [build_sequence(data)]
@@ -150,21 +146,6 @@ module IiifS3
       }
     end
 
-    #--------------------------------------------------------------------------
-    def save_subfile(data)
-      data = data.clone
-      path = data['@id'].gsub(@config.base_uri,@config.output_dir)
-      path_parts = path.split("/")
-      path_parts.pop
-      dir = path_parts.join("/")
-      data["@context"] ||= IiifS3::PRESENTATION_CONTEXT
-      puts "making dir: #{dir}"
-      FileUtils::mkdir_p dir unless Dir.exists? dir
-      puts "writing #{path}"
-      File.open(path, "w") do |file|
-         file.puts JSON.pretty_generate(data)
-      end
-      @config.add_file_to_s3(path)
-    end
+    
   end
 end

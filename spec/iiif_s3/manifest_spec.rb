@@ -1,7 +1,16 @@
-require 'spec_helper'
+ require 'spec_helper'
+ require "base_properties_spec"
+
 
 describe IiifS3::Manifest do
   include_context("fake data")
+
+  context "base" do
+      before(:each) do
+        @object = m
+      end
+      it_behaves_like "base properties"
+  end
 
   let (:config) {IiifS3::Config.new()}
   let (:m) {IiifS3::Manifest.new([@fake_data],config)}
@@ -20,7 +29,7 @@ describe IiifS3::Manifest do
     expect(output["@context"]).to eq(IiifS3::PRESENTATION_CONTEXT)
   end
   it "has a @type" do
-    expect(output["@type"]).to eq(IiifS3::Manifest::MANIFEST_TYPE)
+    expect(output["@type"]).to eq(IiifS3::Manifest::TYPE)
   end
   it "has an @id" do
     expect(output["@id"]).to eq("#{IiifS3::Config::DEFAULT_URL}/1/manifest.json")
@@ -72,7 +81,7 @@ describe IiifS3::Manifest do
       new_data["viewingDirection"] = dir
       m = IiifS3::Manifest.new([new_data],config)
       o = JSON.parse(m.to_json)
-      expect(o["viewingDirection"]).to eq IiifS3::Manifest::DEFAULT_VIEWING_DIRECTION
+      expect(o["viewingDirection"]).to eq IiifS3::DEFAULT_VIEWING_DIRECTION
     end
   end
 
