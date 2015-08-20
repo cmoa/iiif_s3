@@ -27,6 +27,15 @@ describe IiifS3::ImageVariant do
       expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
     end
 
+    it "raises if the image does not have an path" do
+      data.delete "image_path"
+      expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
+    end
+    it "raises if the image has a blank path" do
+      data["image_path"] = ""
+      expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
+    end
+    
     it "raises if the image has an invalid path" do
       data["image_path"] = "/i/am/not/a/real/path.jpg"
       expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
@@ -64,5 +73,21 @@ describe IiifS3::ImageVariant do
     it "has a mime type" do
       expect(@img.mime_type).to eq("image/jpeg")   
     end
+  end
+
+  context "Full Image" do
+    before(:all) do
+      data = {
+        "image_path" => "./spec/data/test.jpg",
+        "id" => 1,
+        "page_number" => 1
+      }
+       config = IiifS3::Config.new
+       @img = IiifS3::FullImage.new(data, config)
+    end
+    it "has the default filestring" do
+      expect(@img.uri).to include "full/full"
+    end
+
   end
 end

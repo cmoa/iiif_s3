@@ -23,10 +23,12 @@ module IiifS3
     end
 
     def add_collection(collection)
+      raise IiifS3::Error::NotACollection unless collection.respond_to?(:type) && collection.type == Collection::TYPE
       @collections.push(collection)
     end
 
     def add_manifest(manifest)
+      raise IiifS3::Error::NotAManifest unless manifest.respond_to?(:type) && manifest.type == Manifest::TYPE
       @manifests.push(manifest)
     end
 

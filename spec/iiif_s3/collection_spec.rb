@@ -47,6 +47,18 @@ describe IiifS3::Collection do
     it "has an id" do
       expect(collection.id).to eq "http://localhost:8000/collection/name.json"
     end
+   
+    it "allows you to add a collection" do
+      newCollection = collection.clone
+      expect{collection.add_collection(newCollection)}.not_to raise_error
+    end
+
+    it "fails if you add something else to a collection" do
+      newCollection = {}
+      expect{collection.add_collection(newCollection)}.to raise_error(IiifS3::Error::NotACollection)
+    end
+
+
     it "generates correct JSON" do
       collection.add_manifest(manifest)
       expect(collection.to_json).to eq @fake_collection

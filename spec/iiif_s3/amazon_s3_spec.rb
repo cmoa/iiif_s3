@@ -9,7 +9,7 @@ describe IiifS3::AmazonS3 do
     end
 
     it "initializes without error" do
-      skip("no internet connection") unless $INTERNET
+      skip("no internet connection") unless $TEST_INTERNET_CONNECTIVITY
       expect{IiifS3::AmazonS3.new}.not_to raise_error
     end
 
@@ -30,7 +30,7 @@ describe IiifS3::AmazonS3 do
       expect{IiifS3::AmazonS3.new}.to raise_error IiifS3::Error::BadAmazonCredentials
     end
     it "fails if the bucket does not exist" do
-      skip("no internet connection") unless $INTERNET
+      skip("no internet connection") unless $TEST_INTERNET_CONNECTIVITY
       cached_val = ENV['AWS_BUCKET_NAME']
       ENV['AWS_BUCKET_NAME'] = 'nonexistent_bucket_name_for_iiif'
       expect{IiifS3::AmazonS3.new}.to raise_error IiifS3::Error::BadAmazonCredentials
@@ -41,7 +41,7 @@ describe IiifS3::AmazonS3 do
   context "Saving data" do
 
     before(:each) do
-      skip("no internet connection") unless $INTERNET
+      skip("no internet connection") unless $TEST_INTERNET_CONNECTIVITY
       @s3 = IiifS3::AmazonS3.new
     end
 

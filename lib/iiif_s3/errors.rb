@@ -21,5 +21,8 @@ module IiifS3
 
     class MissingCollectionName < StandardError; end
 
+    class NotACollection < StandardError; end
+    class NotAManifest < StandardError; end
+    
   end
 end

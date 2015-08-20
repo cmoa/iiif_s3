@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rmagick", "~> 2.15"
   spec.add_runtime_dependency "json-ld", "~> 1.1"
   spec.add_runtime_dependency "jsonlint", "~> 0.1"
+  spec.add_runtime_dependency "simplecov", "~> 0.10"
 end
