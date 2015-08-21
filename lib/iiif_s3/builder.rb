@@ -49,33 +49,36 @@ module IiifS3
       data = [data].flatten # handle hashes and arrays of hashes
 
       # validate
-      data.each  do |datum| 
-        raise IiifS3::Error::InvalidImageData if datum["id"].nil? || datum["page_number"].nil?
+      data.each  do |image_record| 
+        raise IiifS3::Error::InvalidImageData unless image_record.is_a? ImageRecord
+        raise IiifS3::Error::InvalidImageData if image_record.id.nil? || image_record.page_number.nil?
       end
 
-      @data = data.sort_by {|datum| [datum["id"], datum["page_number"]] }
+      @data = data.sort_by {|image_record| [image_record.id, image_record.page_number] }
     end
 
 
     #
     # Take the loaded data and generate all the files.
     #
+    # @param [Boolean] force_image_generation Generate images even if they already exist
     #
     # @return [Void]
     # 
-    def process_data
+    def process_data(force_image_generation=false)
       return nil if @data.nil? # do nothing without data.
 
       resources = {}
-      @data.each do |datum|
+      @data.each do |image_record|
         
-        datum["variants"] = generate_variants(datum, @config)
-        generate_tiles(datum, @config)
-        generate_image_json(datum, @config)
+        # image generation
+        image_record.variants = generate_variants(image_record, @config)
+        generate_tiles(image_record, @config)
+        generate_image_json(image_record, @config)
 
         # Save the image info for the manifest
-        resources[datum["id"]] ||= []
-        resources[datum["id"]].push datum
+        resources[image_record.id] ||= []
+        resources[image_record.id].push image_record
       end
 
       # Generate the manifests
@@ -138,9 +141,9 @@ module IiifS3
     protected
 
     def generate_tiles(data, config) 
-      width = data["variants"]["full"].width
+      width = data.variants["full"].width
       tile_width = config.tile_width
-      height = data["variants"]["full"].height
+      height = data.variants["full"].height
       tiles = []
       config.tile_scale_factors.each do |s|
         (0..(height*1.0/(tile_width*s)).floor).each do |tileY|
@@ -174,16 +177,16 @@ module IiifS3
     end
 
     def generate_image_json(data, config) 
-      info = ImageInfo.new(data["variants"]["full"].id, data['variants'] ,config.tile_width, config.tile_scale_factors)
+      info = ImageInfo.new(data.variants["full"].id, data.variants ,config.tile_width, config.tile_scale_factors)
+      filename = "#{config.build_image_location(data.id,data.page_number)}/info.json"
 
-      filename = "#{config.build_image_location(data['id'],data['page_number'])}/info.json"
       puts "writing #{filename}"
       File.open(filename, "w") do |file|
        file.puts info.to_json 
       end
-      config.add_default_redirect(filename)
       config.add_file_to_s3(filename)
-      return info, filename
+      config.add_default_redirect(filename)
+      return info
     end
 
 

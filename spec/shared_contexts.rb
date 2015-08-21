@@ -52,14 +52,14 @@ RSpec.shared_context "fake data" do
   ]
 }'
 
-    @fake_data = {
+    @fake_data = ImageRecord.new({
       "id" => 1,
       "page_number" => "1",
       "image_path" => "./spec/data/test.jpg",
       "is_master" => true,
       "variants" => @fake_variants,
       "label" => "test label"
-    }
+    })
     @fake_manifest = '{
   "@context": "http://iiif.io/api/presentation/2/context.json",
   "@id": "http://localhost:8000/1/manifest.json",

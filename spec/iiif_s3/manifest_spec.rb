@@ -68,7 +68,7 @@ describe IiifS3::Manifest do
     it "accepts valid viewing directions" do 
       dir = "right-to-left"
       new_data = @fake_data
-      new_data["viewingDirection"] = dir
+      new_data.viewing_direction = dir
       m = IiifS3::Manifest.new([new_data],config)
       o = JSON.parse(m.to_json)
       expect(o["viewingDirection"]).to eq(dir)
@@ -78,7 +78,7 @@ describe IiifS3::Manifest do
     it "rejects invalid viewing directions" do 
       dir = "wonky"
       new_data = @fake_data
-      new_data["viewingDirection"] = dir
+      new_data.viewing_direction = dir
       m = IiifS3::Manifest.new([new_data],config)
       o = JSON.parse(m.to_json)
       expect(o["viewingDirection"]).to eq IiifS3::DEFAULT_VIEWING_DIRECTION

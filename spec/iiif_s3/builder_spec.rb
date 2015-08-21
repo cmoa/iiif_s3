@@ -13,9 +13,9 @@ describe IiifS3::Builder do
   # end
 
   let (:iiif) { IiifS3::Builder.new() }
-  let (:test_object_0) {{"id" => 1, "page_number" => 1}}
-  let (:test_object_1) {{"id" => 2, "page_number" => 1}}
-  let (:test_object_2) {{"id" => 2, "page_number" => 2}}
+  let (:test_object_0) {ImageRecord.new({"id" => 1, "page_number" => 1})}
+  let (:test_object_1) {ImageRecord.new({"id" => 2, "page_number" => 1})}
+  let (:test_object_2) {ImageRecord.new({"id" => 2, "page_number" => 2})}
   let (:data) {[test_object_0, test_object_1,test_object_2]}
 
   context "When initializing" do

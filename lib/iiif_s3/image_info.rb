@@ -9,7 +9,8 @@ module IiifS3
       attr_accessor :id
       attr_accessor :width
       attr_accessor :height
-
+      attr_accessor :tile_width
+      attr_accessor :tile_scale_factors
 
       def initialize(uri, variants, tile_width= nil, tile_scale_factors = nil)
 

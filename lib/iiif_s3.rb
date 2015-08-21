@@ -4,6 +4,7 @@ require 'JSON'
 require "iiif_s3/version"
 require "iiif_s3/errors"
 require "iiif_s3/base_properties"
+require "iiif_s3/image_record"
 require "iiif_s3/builder"
 require "iiif_s3/manifest"
 require "iiif_s3/config"

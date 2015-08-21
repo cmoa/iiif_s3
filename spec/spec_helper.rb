@@ -10,4 +10,4 @@ SimpleCov.start
 require "shared_contexts"
 require 'iiif_s3'
 
-$TEST_INTERNET_CONNECTIVITY = true
+$TEST_INTERNET_CONNECTIVITY = false
