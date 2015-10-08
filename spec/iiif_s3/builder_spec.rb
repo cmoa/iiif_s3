@@ -41,10 +41,6 @@ describe IiifS3::Builder do
       iiif.load(test_object_1)
       expect(iiif.data).to eq([test_object_1])
     end
-    it "will sort objects into ID and page order " do 
-      iiif.load([test_object_2,test_object_0,test_object_1])
-      expect(iiif.data).to eq(data)
-    end
 
     it "will error if the data is bad" do
       expect{iiif.load({random: "hash"})}.to raise_error(IiifS3::Error::InvalidImageData)
