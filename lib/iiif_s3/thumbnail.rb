@@ -13,6 +13,8 @@ module IiifS3
   #
   class Thumbnail < ImageVariant
 
+    DEFAULT_MAX_SIZE = 250
+
     # Initialize a new thumbnail.  
     #
     # @param [hash] data The image data object
@@ -20,7 +22,7 @@ module IiifS3
     # @param [Integer] max_width The maximum width of the thumbnail
     # @param [Integer] max_height The maximum height of the thumbnail
     # 
-    def initialize(data, config, max_width=250, max_height = 250)
+    def initialize(data, config, max_width=DEFAULT_MAX_SIZE, max_height = DEFAULT_MAX_SIZE)
       @max_width = max_width
       @max_height = max_height
       super(data,config)
