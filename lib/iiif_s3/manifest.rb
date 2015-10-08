@@ -20,16 +20,16 @@ module IiifS3
     # CONSTRUCTOR
     #--------------------------------------------------------------------------
 
-    def initialize(data,config, opts = {})
+    def initialize(image_records ,config, opts = {})
       @config = config
-      @primary = data.find{|data| data.is_master}
+      @primary = image_records.find{|obj| obj.is_master}
       raise IiifS3::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
 
       self.id = "#{config.base_uri}/#{@primary.id}/manifest"
       self.label = opts[:label] || @primary.label || ""
       self.description =  opts[:description] || @primary.description
 
-      @sequences = build_sequence(data)
+      @sequences = build_sequence(image_records)
     end
 
     #
@@ -79,7 +79,7 @@ module IiifS3
 
 
     #--------------------------------------------------------------------------
-    def build_sequence(data,opts = {name: DEFAULT_SEQUENCE_NAME}) 
+    def build_sequence(image_records,opts = {name: DEFAULT_SEQUENCE_NAME}) 
       name = opts.delete(:name)
       id = "#{@config.base_uri}/#{@primary.id}/sequence/#{name}"
       id += ".json" if @config.use_extensions
@@ -87,7 +87,7 @@ module IiifS3
       opts.merge({
         "@id" => URI.escape(id),
         "@type" => SEQUENCE_TYPE,
-        "canvases" => data.collect {|image_record| build_canvas(image_record)}
+        "canvases" => image_records.collect {|image_record| build_canvas(image_record)}
       })
     end
 
@@ -126,7 +126,7 @@ module IiifS3
         "resource" => {
           "@id" => data.variants["full"].uri,
           "@type" => IMAGE_TYPE,
-          "format" => data.variants["full"].mime_type,
+          "format" => data.variants["full"].mime_type || "image/jpeg",
           "service" => {
             "@context" => IiifS3::IMAGE_CONTEXT,
             "@id" => data.variants["full"].id,
