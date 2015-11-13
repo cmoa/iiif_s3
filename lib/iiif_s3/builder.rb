@@ -38,23 +38,21 @@ module IiifS3
     # This will load the data, perform some basic verifications on it, and sort
     # it into proper order.
     #
-    # @param [Array<Hash>, Hash] data Either a single imagedata hash or an Array of  imagedata hashes.
-    # 
+    # @param [Array<ImageRecord>, ImageRecord] data 
+    #   Either a single ImageRecord or an Array of ImageRecords.
     # @raise [IiifS3::Error::InvalidImageData] if any of the data does 
     #   not pass the validation checks
     # 
     # @return [Void]
     # 
     def load(data)
-      data = [data].flatten # handle hashes and arrays of hashes
+      @data = [data].flatten # handle hashes and arrays of hashes
 
       # validate
-      data.each  do |image_record| 
+      @data.each  do |image_record| 
         raise IiifS3::Error::InvalidImageData unless image_record.is_a? ImageRecord
         raise IiifS3::Error::InvalidImageData if image_record.id.nil? || image_record.page_number.nil?
       end
-
-      @data = data.sort_by {|image_record| [image_record.id, image_record.page_number] }
     end
 
 
@@ -65,17 +63,22 @@ module IiifS3
     #
     # @return [Void]
     # 
-    def process_data(force_image_generation=false)
+    def process_data(force_image_generation=true)
       return nil if @data.nil? # do nothing without data.
 
       resources = {}
       @data.each do |image_record|
         
         # image generation
-        image_record.variants = generate_variants(image_record, @config)
-        generate_tiles(image_record, @config)
-        generate_image_json(image_record, @config)
-
+        # 
+        # It attempts to load the info files and skip generation — not currently working.
+        if (File.exist?(image_info_file_name(image_record)) && !force_image_generation)
+          image_record.variants load_variants(image_info_file_name(image_record))
+        else
+          image_record.variants = generate_variants(image_record, @config)
+          generate_tiles(image_record, @config)
+          generate_image_json(image_record, @config)
+        end
         # Save the image info for the manifest
         resources[image_record.id] ||= []
         resources[image_record.id].push image_record
@@ -140,6 +143,27 @@ module IiifS3
 
     protected
 
+    def load_variants(path)
+      data = JSON.parse File.read(path)
+     
+      # s
+      # puts data
+      full = Ostruct.new({
+        width: data["width"],
+        height: data["height"],
+        id: data["id"],
+        uri: "#{data["id"]}/full/full/0/default.jpg"
+      })
+      thumb_size = data["sizes"].find{|a| a["width"] == Thumbnail::DEFAULT_MAX_SIZE || a["height"] == Thumbnail::DEFAULT_MAX_SIZE}
+      thumbnail = Ostruct.new({
+        width: thumb_size["width"],
+        height: thumb_size["height"],
+        id: data["id"],
+        uri: "#{data["id"]}/full/#{thumb_size["width"]},/0/default.jpg"
+      })
+      return [full,thumbnail]
+    end
+
     def generate_tiles(data, config) 
       width = data.variants["full"].width
       tile_width = config.tile_width
@@ -176,9 +200,13 @@ module IiifS3
       end
     end
 
+    def image_info_file_name(data)
+      "#{config.build_image_location(data.id,data.page_number)}/info.json"
+    end
+
     def generate_image_json(data, config) 
+      filename = image_info_file_name(data)
       info = ImageInfo.new(data.variants["full"].id, data.variants ,config.tile_width, config.tile_scale_factors)
-      filename = "#{config.build_image_location(data.id,data.page_number)}/info.json"
 
       puts "writing #{filename}"
       File.open(filename, "w") do |file|

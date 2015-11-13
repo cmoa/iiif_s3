@@ -5,7 +5,6 @@ module IiifS3
     attr_accessor :is_document
     attr_accessor :description
     
-    attr_writer :path
     attr_writer :page_number
     attr_writer :section
     attr_writer :section_label
@@ -23,9 +22,13 @@ module IiifS3
       @page_number || 1
     end
 
+    def image_path
+      @path
+    end
+
     def path=(_path)
-      raise IiifS3::Error::InvalidImageData unless File.exist? _path
-      @image_path = _path
+      raise IiifS3::Error::InvalidImageData unless _path && File.exist?(_path)
+      @path = _path
     end
 
     def is_document

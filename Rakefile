@@ -14,4 +14,11 @@ task :cls do
   puts "Clearing the Screen \033c"
 end
 
+task :full do
+  $TEST_INTERNET_CONNECTIVITY = true
+  $SKIP_EXPENSIVE_TESTS = false
+end
+
 task :default => [:cls, :spec, :yard]
+
+task :full_test => [:full, :default]

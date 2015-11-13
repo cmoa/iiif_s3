@@ -46,6 +46,9 @@ describe IiifS3::ImageRecord do
     end
   end
   context "#image_path" do
+    it "raises on a blan path" do
+      expect{image_record.path = nil}.to raise_error(IiifS3::Error::InvalidImageData)
+    end
     it "raises an error for a bad file name" do
       expect{image_record.path = "imaginary_file.jpg"}.to raise_error(IiifS3::Error::InvalidImageData)
     end

@@ -2,46 +2,24 @@ require 'spec_helper'
 
 describe IiifS3::ImageVariant do
   let(:config) {IiifS3::Config.new}
-  let(:data) { {
-      "image_path" => "./spec/data/test.jpg",
+  let(:data) { IiifS3::ImageRecord.new({
+      "path" => "./spec/data/test.jpg",
       "id" => 1,
       "page_number" => 1
-    } }
+    }) }
  
   context "initialization errors" do
     it "raises if the image does not have an ID" do
-      data.delete "id"
+      data.id =nil
       expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
     end
     it "raises if the image has a blank ID" do
-      data["id"] = ""
+      data.id = ""
       expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
     end
 
-    it "raises if the image does not have an page number" do
-      data.delete "page_number"
-      expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
-    end
-    it "raises if the image has a blank page number" do
-      data["page_number"] = ""
-      expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
-    end
-
-    it "raises if the image does not have an path" do
-      data.delete "image_path"
-      expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
-    end
-    it "raises if the image has a blank path" do
-      data["image_path"] = ""
-      expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
-    end
-    
-    it "raises if the image has an invalid path" do
-      data["image_path"] = "/i/am/not/a/real/path.jpg"
-      expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
-    end
     it "raises if the image is not a valid image file" do
-      data["image_path"] = "./spec/data/test.csv"
+      data.path = "./spec/data/test.csv"
       expect{IiifS3::ImageVariant.new(data, config)}.to raise_error(IiifS3::Error::InvalidImageData)
     end
 
@@ -49,11 +27,11 @@ describe IiifS3::ImageVariant do
 
   context "basic data" do
     before(:all) do
-      data = {
-        "image_path" => "./spec/data/test.jpg",
+      data = IiifS3::ImageRecord.new({
+        "path" => "./spec/data/test.jpg",
         "id" => 1,
         "page_number" => 1
-      }
+      })
        config = IiifS3::Config.new
        @img = IiifS3::ImageVariant.new(data, config, 100, 100)
     end
@@ -77,11 +55,11 @@ describe IiifS3::ImageVariant do
 
   context "Full Image" do
     before(:all) do
-      data = {
-        "image_path" => "./spec/data/test.jpg",
+      data = IiifS3::ImageRecord.new({
+        "path" => "./spec/data/test.jpg",
         "id" => 1,
         "page_number" => 1
-      }
+      })
        config = IiifS3::Config.new
        @img = IiifS3::FullImage.new(data, config)
     end

@@ -88,7 +88,7 @@ RSpec.shared_context "fake data" do
               "resource": {
                 "@id": null,
                 "@type": "dcterms:Image",
-                "format": null,
+                "format": "image/jpeg",
                 "service": {
                   "@context": "http://iiif.io/api/image/2/context.json",
                   "@id": "http://www.example.com/images/1",

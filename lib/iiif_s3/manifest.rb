@@ -23,7 +23,7 @@ module IiifS3
     def initialize(image_records ,config, opts = {})
       @config = config
       @primary = image_records.find{|obj| obj.is_master}
-      raise IiifS3::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
+      raise IiifS3::Error::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
 
       self.id = "#{config.base_uri}/#{@primary.id}/manifest"
       self.label = opts[:label] || @primary.label || ""

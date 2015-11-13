@@ -1,41 +1,23 @@
 require 'dotenv'
-
 Dotenv.load
 
 require 'rmagick'
 require_relative 'lib/iiif_s3'
-opts = {}
 
+# Set up configuration variables
+opts = {}
 opts[:image_directory_name] = "img"
 opts[:output_dir] = "/Users/david/Documents/opensource/mirador"
 opts[:variants] = { "reference" => 600, "access" => 1200}
 opts[:upload_to_s3] = true
+opts[:image_types] = [".jpg", ".tif", ".jpeg", ".tiff"]
+opts[:document_file_types] = [".pdf"]
 
+# Setup Temporary stores
 @data = []
-@dir = "./data"
 @cleanup_list = []
-@image_file_types = [".jpg", ".tif", ".jpeg", ".tiff"]
+@dir = "./data"
 
-
-def split_pdf(file)
-  name = File.basename(file, File.extname(file))
-  path = "#{@dir}/#{file}"
-
-  im = Magick::ImageList.new(path) do
-    self.quality = 80
-    self.density = '300'
-    self.colorspace = Magick::RGBColorspace
-    self.interlace = Magick::NoInterlace
-  end
-
-  pages = []
-  im.each_with_index do |page, index|
-    page_file_name = "./tmp/#{name}_#{index+1}.jpg"
-    page.write(page_file_name)
-    pages.push(page_file_name)
-  end
-  pages
-end
 
 def add_image(file, is_doc = false)
   name = File.basename(file, File.extname(file))
@@ -46,7 +28,7 @@ def add_image(file, is_doc = false)
   id = name_parts.join("_")
 
   obj = {
-        "image_path" => "#{file}",
+        "path" => "#{file}",
         "id"       => id,
         "label"    => name_parts.join("."),
         "is_master" => page_num == 1,
@@ -63,7 +45,7 @@ def add_image(file, is_doc = false)
   if is_doc
     obj["is_document"] = true
   end
-  @data.push obj
+  @data.push IiifS3::ImageRecord.new(obj)
 end
 
 def add_to_cleanup_list(img)
@@ -81,10 +63,11 @@ iiif = IiifS3::Builder.new(opts)
 iiif.create_build_directories
 
 Dir.foreach(@dir) do |file|
-  if @image_file_types.include? File.extname(file)
+  if opts[:image_file_types].include? File.extname(file)
     add_image("#{@dir}/#{file}")
-  elsif File.extname(file) == ".pdf"
-    images = split_pdf(file)
+  elsif opts[:document_file_types].include? File.extname(file)
+    path = "#{@dir}/#{file}"
+    images = IiifS3::Utilities::PdfSplitter.split(path)
     images.each  do |img| 
       add_image(img, true)
       add_to_cleanup_list(img)

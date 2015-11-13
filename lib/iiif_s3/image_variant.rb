@@ -29,31 +29,27 @@ module IiifS3
     def initialize(data, config, width = nil, height = nil)
 
       # Validate input data
-      if data["id"].nil? || data["id"].to_s.empty?
+      if data.id.nil? || data.id.to_s.empty?
         raise IiifS3::Error::InvalidImageData, "Each image needs an ID" 
-      elsif data["image_path"].nil? || data["image_path"].to_s.empty?
+      elsif data.image_path.nil? || data.image_path.to_s.empty?
         raise IiifS3::Error::InvalidImageData, "Each image needs an path." 
-      elsif data["page_number"].nil? || data["page_number"].to_s.empty?
-        raise IiifS3::Error::InvalidImageData, "Each image needs an page number." 
-      elsif not File.exists? data["image_path"]
-        raise IiifS3::Error::InvalidImageData, "there is no image at that path." 
       end
 
       # open image
       begin
-        @image = Image.open(data["image_path"])
+        @image = Image.open(data.image_path)
       rescue MiniMagick::Invalid => e
-        raise IiifS3::Error::InvalidImageData, "Cannot read this image file: #{data["image_path"]}. #{e}"
+        raise IiifS3::Error::InvalidImageData, "Cannot read this image file: #{data.image_path}. #{e}"
       end
 
       resize(width, height)
       @image.format "jpg"
 
-      @id = "#{config.image_uri(data['id'],data['page_number'])}"
+      @id = "#{config.image_uri(data.id,data.page_number)}"
       @uri =  "#{id}#{filestring}/default.jpg"
 
       # Create the on-disk version of the file
-      path = "#{config.build_image_location(data["id"],data["page_number"])}#{filestring}"
+      path = "#{config.build_image_location(data.id,data.page_number)}#{filestring}"
       FileUtils::mkdir_p path
       filename = "#{path}/default.jpg"
       @image.write filename unless File.exists? filename

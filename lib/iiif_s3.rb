@@ -15,6 +15,7 @@ require "iiif_s3/image_tile"
 require "iiif_s3/full_image"
 require "iiif_s3/image_info"
 require "iiif_s3/amazon_s3"
+require "iiif_s3/utilities/pdf_splitter"
 
 module IiifS3
 

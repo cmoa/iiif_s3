@@ -1,5 +1,8 @@
 # IiifS3
 
+## WORK IN PROGRESS.  MUCH OF THIS IS INACCURATE OR SPECULATIVE. BETTER DOCS TO COME ASAP.
+
+
 This tool is designed to be used to generate IIIF compatible images stacks and metatdata from a collection of images, and then to upload those images to Amazon S3 for static serving.
 
 It accepts a CSV file of records.  Those CSV files should be in the following format:
@@ -9,7 +12,6 @@ filename          | identifier
 ./images/test.png | 111222333
 
 The headers are optional, but recommended.
-
 
 
 Standard use of the tool is:

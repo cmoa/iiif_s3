@@ -13,7 +13,6 @@
 * [ ] Add explicit tests for internet-enabled configs
 * [ ] Implement test for image data without master
 * [ ] Add tests for baseUriRedirect
-
 * [ ] Implement NoMaster check
 * [ ] Figure out how to optimize the image writing
 * [ ] Add in the ability to skip generated directories (with override)
