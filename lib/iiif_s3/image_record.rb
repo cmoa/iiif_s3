@@ -4,6 +4,8 @@ module IiifS3
     attr_accessor :label
     attr_accessor :is_document
     attr_accessor :description
+    attr_accessor :attribution
+    attr_accessor :logo
     
     attr_writer :page_number
     attr_writer :section
@@ -40,7 +42,7 @@ module IiifS3
     end
 
     def section_label
-      @section || DEFAULT_CANVAS_LABEL
+      @section_label || DEFAULT_CANVAS_LABEL
     end
 
     def is_master
@@ -56,19 +58,3 @@ module IiifS3
     end
   end
 end
-
-
- # obj = {
- #        "image_path" => "#{file}",
- #        "id"       => id,
- #        "label"    => name_parts.join("."),
- #        "page_number" => page_num,
- #        "is_document" => false,
- #        "description" => "This is a test file generated as part of the development on the ruby IiifS3 Gem. <b> This should be bold.</b>"
- #    }
-
- #  if is_paged
- #    obj["section"] = "p#{page_num}"
- #    obj["section_label"] = "Page #{page_num}"
- #  end
- 

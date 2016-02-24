@@ -34,6 +34,8 @@ module IiifS3
         "@type" => self.type,
         "label" => self.label
       }
+      obj["attribution"] = self.attribution if self.attribution
+      obj["logo"] = self.logo if self.logo
       obj["description"] = self.description if self.description
       obj
     end

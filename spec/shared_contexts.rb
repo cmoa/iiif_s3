@@ -58,13 +58,17 @@ RSpec.shared_context "fake data" do
       "image_path" => "./spec/data/test.jpg",
       "is_master" => true,
       "variants" => @fake_variants,
-      "label" => "test label"
+      "label" => "test label",
+      "attribution" => "All rights reserved",
+      "logo" => "http://www.example.com/logo.jpg"
     })
     @fake_manifest = '{
   "@context": "http://iiif.io/api/presentation/2/context.json",
   "@id": "http://localhost:8000/1/manifest.json",
   "@type": "sc:Manifest",
   "label": "test label",
+  "attribution": "All rights reserved",
+  "logo": "http://www.example.com/logo.jpg",
   "thumbnail": null,
   "viewingDirection": "left-to-right",
   "viewingHint": "individuals",

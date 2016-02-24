@@ -50,8 +50,8 @@ module IiifS3
 
       # validate
       @data.each  do |image_record| 
-        raise IiifS3::Error::InvalidImageData unless image_record.is_a? ImageRecord
-        raise IiifS3::Error::InvalidImageData if image_record.id.nil? || image_record.page_number.nil?
+        raise IiifS3::Error::InvalidImageData, "Image record #{image_record.inspect} is not an ImageRecord" unless image_record.is_a? ImageRecord
+        raise IiifS3::Error::InvalidImageData, "Image record #{image_record.inspect} does not have an ID and/or a page number" if image_record.id.nil? || image_record.page_number.nil?
       end
     end
 

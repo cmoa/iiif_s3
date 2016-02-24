@@ -26,8 +26,10 @@ module IiifS3
       raise IiifS3::Error::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
 
       self.id = "#{config.base_uri}/#{@primary.id}/manifest"
-      self.label = opts[:label] || @primary.label || ""
-      self.description =  opts[:description] || @primary.description
+      self.label =        @primary.label       || opts[:label]                 || ""
+      self.description =  @primary.description || opts[:description]
+      self.attribution =  @primary.attribution || opts.fetch(:attribution, nil) 
+      self.logo =         @primary.logo        || opts.fetch(:logo, nil)
 
       @sequences = build_sequence(image_records)
     end
