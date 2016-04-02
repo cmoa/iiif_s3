@@ -1,9 +1,6 @@
 # IiifS3
 
-## WORK IN PROGRESS.  MUCH OF THIS IS INACCURATE OR SPECULATIVE. BETTER DOCS TO COME ASAP.
-
-
-This tool is designed to be used to generate IIIF compatible images stacks and metatdata from a collection of images, and then to upload those images to Amazon S3 for static serving.
+This software library is designed to be used to generate IIIF compatible images stacks and metatdata from a collection of images, and then to upload those images to Amazon S3 for static serving.  
 
 It accepts a CSV file of records.  Those CSV files should be in the following format:
 
@@ -58,6 +55,7 @@ IiifS3 assumes that you have an Amazon S3 account configured for use.  By defaul
 
   The SDK also searches the following locations for a region:
   ENV['AWS_REGION']
+
 
 
 

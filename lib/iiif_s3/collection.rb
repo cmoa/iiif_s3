@@ -8,6 +8,7 @@ module IiifS3
   #
   class Collection
 
+    # @return [String] The IIIF Type for collections
     TYPE = "sc:Collection"
 
     include BaseProperties
@@ -19,7 +20,7 @@ module IiifS3
       @manifests = []
       @collections = []
       self.label = label
-      self.id = @config.uri("collection/#{name}")
+      self.id = "collection/#{name}"
     end
 
     def add_collection(collection)
@@ -32,6 +33,11 @@ module IiifS3
       @manifests.push(manifest)
     end
 
+    # The JSON representation of this collection in the IIIF-expected format
+    #
+    #
+    # @return [String] The JSON representation as a string
+    # 
     def to_json
       obj = base_properties
       obj["collections"] = collect_object(collections) unless collections.empty?

@@ -40,12 +40,12 @@ RSpec.shared_context "fake data" do
     
     @fake_collection = '{
   "@context": "http://iiif.io/api/presentation/2/context.json",
-  "@id": "http://localhost:8000/collection/name.json",
+  "@id": "http://0.0.0.0/collection/name.json",
   "@type": "sc:Collection",
   "label": "Test Data",
   "manifests": [
     {
-      "@id": "http://localhost:8000/1/manifest.json",
+      "@id": "http://0.0.0.0/1/manifest.json",
       "@type": "sc:Manifest",
       "label": "test label"
     }
@@ -56,7 +56,7 @@ RSpec.shared_context "fake data" do
       "id" => 1,
       "page_number" => "1",
       "image_path" => "./spec/data/test.jpg",
-      "is_master" => true,
+      "is_primary" => true,
       "variants" => @fake_variants,
       "label" => "test label",
       "attribution" => "All rights reserved",
@@ -64,7 +64,7 @@ RSpec.shared_context "fake data" do
     })
     @fake_manifest = '{
   "@context": "http://iiif.io/api/presentation/2/context.json",
-  "@id": "http://localhost:8000/1/manifest.json",
+  "@id": "http://0.0.0.0/1/manifest.json",
   "@type": "sc:Manifest",
   "label": "test label",
   "attribution": "All rights reserved",
@@ -74,12 +74,12 @@ RSpec.shared_context "fake data" do
   "viewingHint": "individuals",
   "sequences": [
     {
-      "@id": "http://localhost:8000/1/sequence/default.json",
+      "@id": "http://0.0.0.0/1/sequence/default.json",
       "@type": "sc:Sequence",
       "canvases": [
         {
           "@type": "sc:Canvas",
-          "@id": "http://localhost:8000/1/canvas/front.json",
+          "@id": "http://0.0.0.0/1/canvas/front.json",
           "label": "front",
           "width": 2000,
           "height": 2400,
@@ -87,7 +87,7 @@ RSpec.shared_context "fake data" do
           "images": [
             {
               "@type": "oa:Annotation",
-              "@id": "http://localhost:8000/1/annotation/front.json",
+              "@id": "http://0.0.0.0/1/annotation/front.json",
               "motivation": "sc:painting",
               "resource": {
                 "@id": null,
@@ -101,7 +101,7 @@ RSpec.shared_context "fake data" do
                 "width": 1000,
                 "height": 1200
               },
-              "on": "http://localhost:8000/1/canvas/front.json"
+              "on": "http://0.0.0.0/1/canvas/front.json"
             }
           ]
         }

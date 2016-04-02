@@ -15,8 +15,13 @@ require "iiif_s3/image_tile"
 require "iiif_s3/full_image"
 require "iiif_s3/image_info"
 require "iiif_s3/amazon_s3"
-require "iiif_s3/utilities/pdf_splitter"
+require "iiif_s3/utilities"
 
+# Module IiifS3 is a tool for generating IIIF resources from a set of files.  
+# It's designed to support the IIIF level 0 profile, and generates entirely static files. 
+#
+# @author David Newbury <david.newbury@gmail.com>
+#
 module IiifS3
 
   #--------------------------------------------------------------------------

@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = IiifS3::VERSION
   spec.authors       = ["David Newbury"]
   spec.email         = ["david.newbury@gmail.com"]
-  spec.summary       = "A Generator for an IIIF level 0 compatible static server on Amazon S3."
+  spec.summary       = "A generator for an IIIF level 0 compatible static server on Amazon S3."
   spec.description   = ""
   spec.homepage      = ""
   spec.license       = "MIT"
@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency 'yard'
   spec.add_development_dependency 'dotenv'
+  spec.add_development_dependency "simplecov", "~> 0.10"
 
   spec.add_runtime_dependency "commander", "~> 4.3"
   spec.add_runtime_dependency "aws-sdk", "~> 2.1"
@@ -32,5 +33,4 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rmagick", "~> 2.15"
   spec.add_runtime_dependency "json-ld", "~> 1.1"
   spec.add_runtime_dependency "jsonlint", "~> 0.1"
-  spec.add_runtime_dependency "simplecov", "~> 0.10"
 end

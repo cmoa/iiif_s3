@@ -18,7 +18,7 @@ module IiifS3
     #
     # @param [Hash] data A Image Data object.
     # @param [IiifS3::Config] config The configuration object
-    # @param [Hash<width: Number, height: Number, x Number, y: Number, xSize: Number, ySize:] tile
+    # @param [Hash<width: Number, height: Number, x Number, y: Number, xSize: Number, ySize: Number>] tile
     #    A hash of parameters that defines this tile.
     def initialize(data, config, tile)
       @tile = tile

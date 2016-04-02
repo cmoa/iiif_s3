@@ -14,17 +14,17 @@ describe IiifS3::Collection do
     it "initializes without issues" do
       collection = nil
       expect{collection = IiifS3::Collection.new("Test data", config)}.not_to raise_error
-      expect(collection.id).to eq("http://localhost:8000/collection/top.json")
+      expect(collection.id).to eq("http://0.0.0.0/collection/top.json")
     end
     it "initializes without issues when provided a name" do
       collection = nil
       expect{collection = IiifS3::Collection.new("Test data", config, "name")}.not_to raise_error
-      expect(collection.id).to eq("http://localhost:8000/collection/name.json")
+      expect(collection.id).to eq("http://0.0.0.0/collection/name.json")
     end
     it "initializes without issues when provided a name with a space in it" do
       collection = nil
       expect{collection = IiifS3::Collection.new("Test data", config, "name and space")}.not_to raise_error
-      expect(collection.id).to eq("http://localhost:8000/collection/name%20and%20space.json")
+      expect(collection.id).to eq("http://0.0.0.0/collection/name%20and%20space.json")
     end
     it "fails if there is no label" do
       expect{collection = IiifS3::Collection.new(nil, config)}.to raise_error(IiifS3::Error::MissingCollectionName)
@@ -45,7 +45,7 @@ describe IiifS3::Collection do
       expect(collection.label).to eq "Test Data"
     end
     it "has an id" do
-      expect(collection.id).to eq "http://localhost:8000/collection/name.json"
+      expect(collection.id).to eq "http://0.0.0.0/collection/name.json"
     end
    
     it "allows you to add a collection" do

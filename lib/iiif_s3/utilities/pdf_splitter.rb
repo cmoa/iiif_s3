@@ -9,10 +9,17 @@ module IiifS3
     # @author David Newbury <david.newbury@gmail.com>
     #
     class PdfSplitter
-      def self.split(path, opts={})
+      # Convert a PDF File into a series of JPEG images, one per-page
+      #
+      # @param [String] path The path to the PDF file
+      # @param [Hash] options The configuration hash
+      #
+      # @return [Array<String>] The paths to the generated files
+      # 
+      def self.split(path, options={})
 
-        output_dir = opts.fetch(:output_dir, "./tmp")
-        verbose = opts.fetch(:verbose, false)
+        output_dir = options.fetch(:output_dir, "./tmp")
+        verbose = options.fetch(:verbose, false)
         puts "processing #{path}" if verbose
         name = File.basename(path, File.extname(path))
 

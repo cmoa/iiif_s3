@@ -27,12 +27,19 @@ module IiifS3
         @tile_scale_factors = tile_scale_factors
       end
 
+      # @return [Hash] a collection of valid sizes based on the available image variants
+      #  
       def sizes
          @variants.collect do |name,obj|
           {"width" => obj.width, "height" => obj.height}
         end
       end
 
+      # The hash of tile information, or nil if the information does not exist.
+      #
+      #
+      # @return [Hash, nil] A hash of the tile metadata properly formatted for IIIF JSON.
+      # 
       def tiles
         return nil if @tile_scale_factors.nil? || @tile_scale_factors.empty?
         
@@ -43,6 +50,11 @@ module IiifS3
       end
 
 
+      # Generate the JSON data for this image in the IIIF-expected format.
+      #
+      #
+      # @return [String] the JSON representation of this image
+      # 
       def to_json
         obj = {
           "@context" => context,
@@ -59,14 +71,17 @@ module IiifS3
         JSON.pretty_generate obj
       end
 
+      # @return [String] The IIIF context for this image
       def context
        IiifS3::IMAGE_CONTEXT
       end
 
+      # @return [String] The IIIF protocol for this image
       def protocol 
         IiifS3::IMAGE_PROTOCOL
       end
 
+      # @return [String] The IIIF profile this image supports
       def profile
         [IiifS3::LEVEL_0,{
           supports: ["cors","sizeByWhListed", "baseUriRedirect"]

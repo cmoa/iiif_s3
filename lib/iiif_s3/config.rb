@@ -1,11 +1,18 @@
 module IiifS3
   class Config
 
-    DEFAULT_URL = "http://localhost:8000"
-    DEFAULT_IMAGE_STRING = "images"
+    # @return [String] The default URL to append to all IDs.
+    DEFAULT_URL = "http://0.0.0.0"
+    # @return [String] The name of the subdirectory where generated images live 
+    DEFAULT_IMAGE_DIRECTORY_NAME = "images"
+    # @return [String] The default path for writing generated images and data files
     DEFAULT_OUTPUT_DIRECTORY = "./build"
+    # @return [Number] The default tile width/height in pixels
     DEFAULT_TILE_WIDTH = 512
+    # @return [Array<Number>] The default tile scaling factors
     DEFAULT_TILE_SCALE_FACTORS = [1,2,4,8]
+    # @return [Number] The default thumnail size in pixels
+    DEFAULT_THUMBNAIL_SIZE = 250    
 
     #
     # @!attribute [r] base_uri
@@ -34,7 +41,7 @@ module IiifS3
     # @!attribute [r] image_directory_name
     #   @return [String] The name of the directory/prefix where image files will be
     #   located.
-    #   @default IiifS3::Config::DEFAULT_IMAGE_STRING
+    #   @default IiifS3::Config::DEFAULT_IMAGE_DIRECTORY_NAME
     attr_reader :image_directory_name
     #
     # @!attribute [r] tile_width
@@ -58,13 +65,17 @@ module IiifS3
     #   @default false
     attr_reader :upload_to_s3
 
+    # @!attribute [r] thumbnail_size
+    #   @return [Number] The max width in pixels for a thumbnail image
+    attr_reader :thumbnail_size
+
     def initialize(opts = {})
 
       @upload_to_s3 = opts[:upload_to_s3] || false
       @s3 = IiifS3::AmazonS3.new if @upload_to_s3
       @tile_width = opts[:tile_width] || DEFAULT_TILE_WIDTH
       @tile_scale_factors = opts[:tile_scale_factors] || DEFAULT_TILE_SCALE_FACTORS
-      @image_directory_name = opts[:image_directory_name] || DEFAULT_IMAGE_STRING
+      @image_directory_name = opts[:image_directory_name] || DEFAULT_IMAGE_DIRECTORY_NAME
       @base_uri = opts[:base_uri] || ( @upload_to_s3 ? @s3.bucket.url : DEFAULT_URL)
       @use_extensions = opts[:use_extensions].nil? ? true : opts[:use_extensions]
       @output_dir = opts[:output_dir] || DEFAULT_OUTPUT_DIRECTORY
@@ -74,6 +85,7 @@ module IiifS3
       if @prefix.length > 0 && @prefix[0] != "/"
         @prefix = "/#{@prefix}" 
       end
+      @thumbnail_size = opts[:thumbnail_size] || DEFAULT_THUMBNAIL_SIZE
     end
 
     def build_location(id)
@@ -82,14 +94,6 @@ module IiifS3
 
     def build_image_location(id, page_number)
       "#{output_dir}#{prefix}/#{image_directory_name}/#{id}-#{page_number}"
-    end
-
-    def uri(id)
-      "#{base_uri}#{prefix}/#{id}"
-    end
-
-    def image_uri(id, page_number)
-      "#{base_uri}#{prefix}/#{image_directory_name}/#{id}-#{page_number}"
     end
 
     def add_default_redirect(filename) 
@@ -107,17 +111,24 @@ module IiifS3
     end
 
     def add_file_to_s3(filename)
+      return unless @upload_to_s3
       key = filename.gsub(output_dir,"")
       key = key[1..-1] if key[0] == "/"
       if File.extname(filename) == ".json" || File.extname(filename)  == ""
-        @s3.add_json(key,filename) if @upload_to_s3
+        @s3.add_json(key,filename) 
       elsif  File.extname(filename) == ".jpg" 
-        @s3.add_image(key,filename) if @upload_to_s3
+        @s3.add_image(key,filename)
       else
         raise "Cannot identify file type!"
       end
     end
 
+    # Compare two configuration files
+    #
+    # @param [IiifS3::Config] other_config The configuration file to compare
+    #
+    # @return [Bool] True if they are the same, false otherwise
+    # 
     def ==(other_config)
       valid = true
       self.instance_variables.each do |v|

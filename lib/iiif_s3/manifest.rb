@@ -1,6 +1,5 @@
 module IiifS3
 
-
   #
   # Class Manifest is an abstraction over the IIIF Manifest, and by extension over the
   # entire Presentation API.  It takes the internal representation of data and converts
@@ -20,12 +19,23 @@ module IiifS3
     # CONSTRUCTOR
     #--------------------------------------------------------------------------
 
-    def initialize(image_records ,config, opts = {})
+    # This will initialize a new manifest.
+    #
+    # @param [Array<ImageRecord>] image_records An array of ImageRecord types
+    # @param [<type>] config <description>
+    # @param [<type>] opts <description>
+    # 
+    def initialize(image_records,config, opts = {})
       @config = config
-      @primary = image_records.find{|obj| obj.is_master}
-      raise IiifS3::Error::InvalidImageData, "No 'is_master' was found in the image data." unless @primary
+      image_records.each do |record|
+        raise IiifS3::Error::InvalidImageData, "The data provided to the manifest were not ImageRecords" unless record.is_a? ImageRecord
+      end
 
-      self.id = "#{config.base_uri}/#{@primary.id}/manifest"
+      @primary = image_records.find{|obj| obj.is_primary}
+      raise IiifS3::Error::InvalidImageData, "No 'is_primary' was found in the image data." unless @primary
+      raise IiifS3::Error::MultiplePrimaryImages, "Multiple primary images were found in the image data." unless image_records.count{|obj| obj.is_primary} == 1
+
+      self.id =          "#{@primary.id}/manifest"
       self.label =        @primary.label       || opts[:label]                 || ""
       self.description =  @primary.description || opts[:description]
       self.attribution =  @primary.attribution || opts.fetch(:attribution, nil) 
@@ -35,18 +45,13 @@ module IiifS3
     end
 
     #
-    #
     # @return [String]  the JSON-LD representation of the manifest as a string.
     # 
     def to_json
       obj = base_properties
 
       obj["thumbnail"]   = @primary.variants["thumbnail"].uri
-
-     
-
-      obj["viewingDirection"] = DEFAULT_VIEWING_DIRECTION
-      obj["viewingDirection"] = @primary.viewing_direction if IiifS3.is_valid_viewing_direction(@primary.viewing_direction) 
+      obj["viewingDirection"] = @primary.viewing_direction 
       obj["viewingHint"] = @primary.is_document ? "paged" : "individuals"
       obj["sequences"] = [@sequences]
 
@@ -83,11 +88,10 @@ module IiifS3
     #--------------------------------------------------------------------------
     def build_sequence(image_records,opts = {name: DEFAULT_SEQUENCE_NAME}) 
       name = opts.delete(:name)
-      id = "#{@config.base_uri}/#{@primary.id}/sequence/#{name}"
-      id += ".json" if @config.use_extensions
+      seq_id = generate_id "#{@primary.id}/sequence/#{name}"
 
       opts.merge({
-        "@id" => URI.escape(id),
+        "@id" => seq_id,
         "@type" => SEQUENCE_TYPE,
         "canvases" => image_records.collect {|image_record| build_canvas(image_record)}
       })
@@ -96,12 +100,11 @@ module IiifS3
     #--------------------------------------------------------------------------
     def build_canvas(data)
 
-      id = "#{@config.base_uri}#{@config.prefix}/#{data.id}/canvas/#{data.section}"
-      id += ".json" if @config.use_extensions
+      canvas_id = generate_id "#{data.id}/canvas/#{data.section}"
 
       obj = {
         "@type" => CANVAS_TYPE,
-        "@id"   => URI.escape(id),
+        "@id"   => canvas_id,
         "label" => data.section_label,
         "width" => data.variants["full"].width.floor,
         "height" => data.variants["full"].height.floor,
@@ -118,12 +121,11 @@ module IiifS3
     end
 
     #--------------------------------------------------------------------------
-    def build_image(data, canvas)
-      name = canvas['@id'].split("/").last
-      id =  "#{@config.base_uri}#{@config.prefix}/#{data.id}/annotation/#{name}"
+    def build_image(data, canvas)     
+      annotation_id =  generate_id "#{data.id}/annotation/#{data.section}"
       {
         "@type" => ANNOTATION_TYPE,
-        "@id"   => URI.escape(id),
+        "@id"   => annotation_id,
         "motivation" => MOTIVATION,
         "resource" => {
           "@id" => data.variants["full"].uri,
@@ -139,8 +141,6 @@ module IiifS3
         },
         "on" => canvas["@id"]
       }
-    end
-
-    
+    end   
   end
 end

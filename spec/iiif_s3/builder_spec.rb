@@ -52,7 +52,7 @@ describe IiifS3::Builder do
     include_context("fake variants")
     include_context("fake data")
     before(:example) do
-      @iiif = IiifS3::Builder.new({base_uri: 'http://localhost:8000'})
+      @iiif = IiifS3::Builder.new({base_uri: 'http://0.0.0.0'})
       @iiif.load(@fake_data)
       allow(@iiif).to receive(:generate_tiles) {nil}
       allow(@iiif).to receive(:generate_variants) {@fake_variants}

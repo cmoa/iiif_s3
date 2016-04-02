@@ -37,10 +37,10 @@ describe IiifS3::ImageVariant do
     end
     
     it "has a uri" do
-      expect(@img.uri).to eq("#{config.image_uri(1,1)}/full/83,/0/default.jpg")
+      expect(@img.uri).to eq("#{@img.generate_image_id(1,1)}/full/83,/0/default.jpg")
     end     
     it "has an id" do
-      expect(@img.id).to eq("#{config.image_uri(1,1)}")
+      expect(@img.id).to eq("#{@img.generate_image_id(1,1)}")
     end 
     it "has a width" do
       expect(@img.width).to eq(83)

@@ -20,6 +20,7 @@ describe IiifS3::Manifest do
     expect(m).to be_a(IiifS3::Manifest)    
   end
 
+
   it "exports JSON-LD as a valid JSON string" do
     expect(m.to_json).to be_a(String)
     expect{JSON.parse(m.to_json)}.not_to raise_error
@@ -35,6 +36,23 @@ describe IiifS3::Manifest do
     expect(output["@id"]).to eq("#{IiifS3::Config::DEFAULT_URL}/1/manifest.json")
   end 
   
+  context "error checking" do
+    it "throws an error if not provided ImageRecords" do
+      expect{IiifS3::Manifest.new(["not an image record"],config)}.to raise_error(IiifS3::Error::InvalidImageData)
+    end
+    it "throws an error unless there's a primary image" do
+      data = @fake_data.clone
+      data.is_primary = false
+      expect{IiifS3::Manifest.new([data],config)}.to raise_error(IiifS3::Error::InvalidImageData)
+    end
+    it "throws an error if there are two primary images" do
+      data1 = IiifS3::ImageRecord.new({is_primary: true})
+      data2 = IiifS3::ImageRecord.new({is_primary: true})
+
+      expect{IiifS3::Manifest.new([data1, data2],config)}.to raise_error(IiifS3::Error::MultiplePrimaryImages)
+    end
+  end
+
   context "config variables" do
     let (:config) {IiifS3::Config.new({:use_extensions => false})}
     it "the @id has an extension if configured thusly" do
@@ -73,15 +91,6 @@ describe IiifS3::Manifest do
       o = JSON.parse(m.to_json)
       expect(o["viewingDirection"]).to eq(dir)
 
-    end
-
-    it "rejects invalid viewing directions" do 
-      dir = "wonky"
-      new_data = @fake_data
-      new_data.viewing_direction = dir
-      m = IiifS3::Manifest.new([new_data],config)
-      o = JSON.parse(m.to_json)
-      expect(o["viewingDirection"]).to eq IiifS3::DEFAULT_VIEWING_DIRECTION
     end
   end
 

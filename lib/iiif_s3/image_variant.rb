@@ -28,6 +28,7 @@ module IiifS3
     #  
     def initialize(data, config, width = nil, height = nil)
 
+      @config = config
       # Validate input data
       if data.id.nil? || data.id.to_s.empty?
         raise IiifS3::Error::InvalidImageData, "Each image needs an ID" 
@@ -45,7 +46,7 @@ module IiifS3
       resize(width, height)
       @image.format "jpg"
 
-      @id = "#{config.image_uri(data.id,data.page_number)}"
+      @id =   generate_image_id(data.id,data.page_number)
       @uri =  "#{id}#{filestring}/default.jpg"
 
       # Create the on-disk version of the file
@@ -90,6 +91,17 @@ module IiifS3
     # 
     def mime_type
       @image.mime_type
+    end
+
+    # Generate a URI for an image
+    #
+    # @param [String] id The specific ID for the image
+    # @param [String, Number] page_number The page number for this particular image.
+    #
+    # @return [<type>] <description>
+    # 
+    def generate_image_id(id, page_number)
+      "#{@config.base_uri}#{@config.prefix}/#{@config.image_directory_name}/#{id}-#{page_number}"
     end
 
     protected
