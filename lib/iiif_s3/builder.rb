@@ -14,7 +14,7 @@ module IiifS3
     #
     # @!attribute [r] manifests
     #   @return [Array<Hash>] The manifest hashes for this configuration
-    attr_reader :manifests
+    attr_accessor :manifests
 
     # @!attribute [r] config
     #   @return [IiifS3::Config] The configuration object
