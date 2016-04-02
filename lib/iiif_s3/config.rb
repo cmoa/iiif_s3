@@ -69,6 +69,11 @@ module IiifS3
     #   @return [Number] The max width in pixels for a thumbnail image
     attr_reader :thumbnail_size
 
+    # @!attribute [r] verbose
+    #   @return [Bool] Should the program log information to the console?
+    attr_reader :verbose
+    alias :verbose? :verbose
+
     def initialize(opts = {})
 
       @upload_to_s3 = opts[:upload_to_s3] || false
@@ -86,6 +91,7 @@ module IiifS3
         @prefix = "/#{@prefix}" 
       end
       @thumbnail_size = opts[:thumbnail_size] || DEFAULT_THUMBNAIL_SIZE
+      verbose = opts.fetch(:verbose, false)
     end
 
     def build_location(id)
@@ -105,7 +111,7 @@ module IiifS3
 
       unless key == name_key
         key = "#{@base_uri}/#{key}"
-        puts "adding redirect from #{name_key} to #{key}"
+        puts "adding redirect from #{name_key} to #{key}" if verbose?
         @s3.add_redirect(name_key, key)
       end
     end
@@ -137,5 +143,12 @@ module IiifS3
       valid
     end
 
+    # Set if the application should log debugging data to the console
+    #
+    # @param [Bool] val
+    # @return [Bool] 
+    def verbose=(val)
+      @verbose = !!val
+    end
   end
 end

@@ -21,7 +21,11 @@ module IiifS3
     #
     # @return [Void]
     # 
-    def initialize
+    def initialize(options = {})
+      defaults = {
+        verbose: false
+      }
+      @options = defaults.merge(options)
       if ENV['AWS_ACCESS_KEY_ID'].nil?
         raise IiifS3::Error::BadAmazonCredentials, "Could not find the correct Access Key ID in ENV['AWS_ACCESS_KEY_ID']"
       elsif ENV['AWS_SECRET_ACCESS_KEY'].nil?
@@ -66,7 +70,7 @@ module IiifS3
       }
       obj.merge!(options)
 
-      puts "uploading #{filename} to #{key}"
+      puts "uploading #{filename} to #{key}" if @options[:verbose]
       File.open(filename,'rb') do |source_file|
         obj[:body] = source_file
         bucket.put_object(obj)

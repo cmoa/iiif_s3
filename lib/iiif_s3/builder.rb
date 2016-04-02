@@ -208,7 +208,7 @@ module IiifS3
       filename = image_info_file_name(data)
       info = ImageInfo.new(data.variants["full"].id, data.variants ,config.tile_width, config.tile_scale_factors)
 
-      puts "writing #{filename}"
+      puts "writing #{filename}" if config.verbose?
       File.open(filename, "w") do |file|
        file.puts info.to_json 
       end
