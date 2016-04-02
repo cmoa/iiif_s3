@@ -1,11 +1,17 @@
 module IiifS3
+  
+  # Config provides a data structure for holding the configuration settings
+  # for the IiifS3 class.  
+  #
+  # @author David Newbury <david.newbury@gmail.com>
+  #
   class Config
 
     # @return [String] The default URL to append to all IDs.
     DEFAULT_URL = "http://0.0.0.0"
     # @return [String] The name of the subdirectory where generated images live 
     DEFAULT_IMAGE_DIRECTORY_NAME = "images"
-    # @return [String] The default path for writing generated images and data files
+    # @return [String] The default path for writing generated image files
     DEFAULT_OUTPUT_DIRECTORY = "./build"
     # @return [Number] The default tile width/height in pixels
     DEFAULT_TILE_WIDTH = 512
@@ -15,54 +21,54 @@ module IiifS3
     DEFAULT_THUMBNAIL_SIZE = 250    
 
     #
-    # @!attribute [r] base_uri
+    # @!attribute [r] base_url
     #   @return [String] The protocol, domain, and port used for generating URIs.
-    #   @default IiifS3::Config::DEFAULT_URL
-    attr_reader :base_uri
+    #   Defaults to {IiifS3::Config::DEFAULT_URL}
+    attr_reader :base_url
     #
     # @!attribute [r] use_extensions
     #   @return [Boolean] Should generated IDs and files have a .json extension?
-    #   @default true
+    #   Defaults to true
     attr_reader :use_extensions
     #
     # @!attribute [r] output_dir
     #   @return [String] The directory on the local file system where the output
     #     files should be saved
-    #     @default IiifS3::Config::DEFAULT_OUTPUT_DIRECTORY
+    #     Defaults to {IiifS3::Config::DEFAULT_OUTPUT_DIRECTORY}
     attr_reader :output_dir
     #
     # @!attribute [r] prefix
     #   @return [String] A prefix to be appended between the base URI and the id.
     #     Can be blank,and it will automatically prepend a slash if one is not
     #     provided.
-    #   @default ""
+    #   Defaults to ""
     attr_reader :prefix
     #
     # @!attribute [r] image_directory_name
     #   @return [String] The name of the directory/prefix where image files will be
     #   located.
-    #   @default IiifS3::Config::DEFAULT_IMAGE_DIRECTORY_NAME
+    #   Defaults to IiifS3::Config::DEFAULT_IMAGE_DIRECTORY_NAME
     attr_reader :image_directory_name
     #
     # @!attribute [r] tile_width
     #   @return [Number] The width (and height) of each individual tile.
-    #   @default IiifS3::Config::DEFAULT_TILE_WIDTH
+    #   Defaults to IiifS3::Config::DEFAULT_TILE_WIDTH
     attr_reader :tile_width
     #
     # @!attribute [r] tile
     #   @return [Array<Number>] An array of tile ratios to be uploaded.
-    #   @default IiifS3::Config::DEFAULT_TILE_SCALE_FACTORS
+    #   Defaults to IiifS3::Config::DEFAULT_TILE_SCALE_FACTORS
     attr_reader :tile_scale_factors
     #
     # @!attribute [r] variants
     #   @return [Hash] A Hash of key/value pairs.  Each key should be the name of a variant,
     #     each value the maximum pixel dimension of the longest side.
-    #   @default {}
+    #   Defaults to {}
     attr_reader :variants
     #
     # @!attribute [r] upload_to_s3
     #   @return [Boolean] Should the files that are created by automatically uploaded to Amazon S3?
-    #   @default false
+    #   Defaults to false
     attr_reader :upload_to_s3
 
     # @!attribute [r] thumbnail_size
@@ -74,15 +80,40 @@ module IiifS3
     attr_reader :verbose
     alias :verbose? :verbose
 
-    def initialize(opts = {})
+    # @!attribute [r] s3
+    #   @return [IiifS3::AmazonS3] the S3 object for this system
+    attr_reader :s3
 
+
+    # Initialize a new configuration option.
+    #
+    # @param [Hash] opts 
+    # @option opts [Boolean] :upload_to_s3 if true, images and metadata will be
+    #   uploaded to Amazon S3.  Defaults to False.
+    # @option opts [Number] :tile_width The width in pixels for generated tiles.
+    #   Defaults to {DEFAULT_TILE_WIDTH}
+    # @option opts [Array<Number>] :tile_scale_factors An array of ratios for generated tiles.
+    #   Defaults to {DEFAULT_TILE_SCALE_FACTORS}
+    # @option opts [String] :image_directory_name The name of the subdirectory for actual
+    #   image data. Defaults to {DEFAULT_IMAGE_DIRECTORY_NAME}
+    # @option opts [String] :output_dir The name of the directory for generated files.
+    #   image data. Defaults to {DEFAULT_OUTPUT_DIRECTORY}
+    # @option opts [String] :base_url The base URL for the generated URIs.  Defaults to
+    #   {DEFAULT_URL} if not auto-uploading to S3 and to the s3 bucket if upload_to_s3 is enabled. 
+    # @option opts [Number] :thumbnail_size the size in pixels
+    #   for the largest side of the thumbnail images.  Defaults to {DEFAULT_THUMBNAIL_SIZE}.
+    # @option opts [Bool] :use_extensions (true) should files have exensions appended?  
+    # @option opts [Bool] :verbose (false) Should debug information be printed to the console?  
+    # @option opts [String] :prefix ("") a prefix (read: subdirectory) for the generated URIs.
+    # @option opts [Hash{String: String}] :variants
+    def initialize(opts = {})
       @upload_to_s3 = opts[:upload_to_s3] || false
       @s3 = IiifS3::AmazonS3.new if @upload_to_s3
       @tile_width = opts[:tile_width] || DEFAULT_TILE_WIDTH
       @tile_scale_factors = opts[:tile_scale_factors] || DEFAULT_TILE_SCALE_FACTORS
       @image_directory_name = opts[:image_directory_name] || DEFAULT_IMAGE_DIRECTORY_NAME
-      @base_uri = opts[:base_uri] || ( @upload_to_s3 ? @s3.bucket.url : DEFAULT_URL)
-      @use_extensions = opts[:use_extensions].nil? ? true : opts[:use_extensions]
+      @base_url = opts[:base_url] || ( @upload_to_s3 ? @s3.bucket.url : DEFAULT_URL)
+      @use_extensions = opts.fetch(:use_extensions, true)
       @output_dir = opts[:output_dir] || DEFAULT_OUTPUT_DIRECTORY
       @image_dir = @output_dir
       @variants = opts[:variants] || {}
@@ -94,40 +125,6 @@ module IiifS3
       verbose = opts.fetch(:verbose, false)
     end
 
-    def build_location(id)
-      "#{output_dir}#{prefix}/#{id}"
-    end
-
-    def build_image_location(id, page_number)
-      "#{output_dir}#{prefix}/#{image_directory_name}/#{id}-#{page_number}"
-    end
-
-    def add_default_redirect(filename) 
-      return unless  @upload_to_s3
-      key = filename.gsub(output_dir,"")
-      key = key[1..-1] if key[0] == "/"
-
-      name_key = key.split(".")[0..-2].join(".")
-
-      unless key == name_key
-        key = "#{@base_uri}/#{key}"
-        puts "adding redirect from #{name_key} to #{key}" if verbose?
-        @s3.add_redirect(name_key, key)
-      end
-    end
-
-    def add_file_to_s3(filename)
-      return unless @upload_to_s3
-      key = filename.gsub(output_dir,"")
-      key = key[1..-1] if key[0] == "/"
-      if File.extname(filename) == ".json" || File.extname(filename)  == ""
-        @s3.add_json(key,filename) 
-      elsif  File.extname(filename) == ".jpg" 
-        @s3.add_image(key,filename)
-      else
-        raise "Cannot identify file type!"
-      end
-    end
 
     # Compare two configuration files
     #

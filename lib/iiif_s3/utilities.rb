@@ -1,4 +1,5 @@
 require_relative "utilities/pdf_splitter"
+require_relative "utilities/helpers"
 
 module IiifS3
   # Module Utilities provides a set of basic utilities and helper functions for

@@ -1,9 +1,11 @@
+require 'json/ld'
+require_relative "utilities"
+
 module IiifS3
-  require 'json/ld'
-
-
   class Builder
     
+    include Utilities::Helpers
+
     HEADER_VAL = 'filename'
     
     #
@@ -99,9 +101,9 @@ module IiifS3
     #
     # @return [Void]
     def create_build_directories
-      root_dir =  @config.build_location("")
+    root_dir =  generate_build_location("")
       Dir.mkdir root_dir unless Dir.exists?(root_dir)
-      img_dir = @config.build_image_location("","").split("/")[0...-1].join("/")
+      img_dir = generate_image_location("","").split("/")[0...-1].join("/")
       Dir.mkdir img_dir unless Dir.exists?(img_dir)
     end
 
@@ -201,7 +203,7 @@ module IiifS3
     end
 
     def image_info_file_name(data)
-      "#{config.build_image_location(data.id,data.page_number)}/info.json"
+      "#{generate_image_location(data.id,data.page_number)}/info.json"
     end
 
     def generate_image_json(data, config) 
@@ -212,8 +214,10 @@ module IiifS3
       File.open(filename, "w") do |file|
        file.puts info.to_json 
       end
-      config.add_file_to_s3(filename)
-      config.add_default_redirect(filename)
+      if @config.upload_to_s3
+        add_file_to_s3(filename)
+        add_default_redirect(filename)
+      end
       return info
     end
 

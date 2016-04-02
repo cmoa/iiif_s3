@@ -1,6 +1,8 @@
 
 require "mini_magick"
 require 'fileutils'
+require_relative "utilities"
+
 
 module IiifS3
 
@@ -11,6 +13,7 @@ module IiifS3
   # @author David Newbury <david.newbury@gmail.com>
   #
   class ImageVariant
+    include Utilities::Helpers
     include MiniMagick
 
     #
@@ -50,11 +53,11 @@ module IiifS3
       @uri =  "#{id}#{filestring}/default.jpg"
 
       # Create the on-disk version of the file
-      path = "#{config.build_image_location(data.id,data.page_number)}#{filestring}"
+      path = "#{generate_image_location(data.id,data.page_number)}#{filestring}"
       FileUtils::mkdir_p path
       filename = "#{path}/default.jpg"
       @image.write filename unless File.exists? filename
-      config.add_file_to_s3(filename)
+      add_file_to_s3(filename) if @config.upload_to_s3
     end
 
 
@@ -101,7 +104,7 @@ module IiifS3
     # @return [<type>] <description>
     # 
     def generate_image_id(id, page_number)
-      "#{@config.base_uri}#{@config.prefix}/#{@config.image_directory_name}/#{id}-#{page_number}"
+      "#{@config.base_url}#{@config.prefix}/#{@config.image_directory_name}/#{id}-#{page_number}"
     end
 
     protected

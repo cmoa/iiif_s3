@@ -1,3 +1,4 @@
+require_relative "utilities"
 module IiifS3
 
   # Module BaseProperties provides the set of properties that are shared across
@@ -13,6 +14,8 @@ module IiifS3
   # @author David Newbury <david.newbury@gmail.com>
   #
   module BaseProperties
+    include Utilities::Helpers
+
 
     # @!attribute [rw] label
     #   @return [String] The human-readable label for this record
@@ -84,24 +87,12 @@ module IiifS3
     end
 
 
-    # This will generate a valid, escaped URI for an object.
-    # 
-    # This will prepend the standard path and prefix, and will append .json
-    # if enabled.
-    #
-    # @param [String] path The desired ID string
-    # @return [String] The generated URI
-    def generate_id(path)
-      val =  "#{@config.base_uri}#{@config.prefix}/#{path}"
-      val += ".json" if @config.use_extensions
-      URI.escape(val)
-    end
 
     protected
 
     #--------------------------------------------------------------------------
     def save_to_disk(data)
-      path = data['@id'].gsub(@config.base_uri,@config.output_dir)
+      path = data['@id'].gsub(@config.base_url,@config.output_dir)
       path_parts = path.split("/")
       path_parts.pop
       dir = path_parts.join("/")
@@ -112,7 +103,7 @@ module IiifS3
       File.open(path, "w") do |file|
          file.puts JSON.pretty_generate(data)
       end
-      @config.add_file_to_s3(path)
+      add_file_to_s3(path) if @config.upload_to_s3
     end
   end
 end

@@ -60,8 +60,8 @@ describe IiifS3::Manifest do
     end
   end
 
-  context "base_uri config variable" do
-    let (:config) {IiifS3::Config.new({base_uri: "http://www.example.com"})}
+  context "base_url config variable" do
+    let (:config) {IiifS3::Config.new({base_url: "http://www.example.com"})}
     it "uses non-test uris" do
       expect(output["@id"]).to eq("http://www.example.com/1/manifest.json")
     end
