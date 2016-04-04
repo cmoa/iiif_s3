@@ -6,7 +6,7 @@ describe IiifS3::Builder do
   #   fake_aws_bucket = OpenStruct.new({
   #     "exists?" => "true"
   #   })
-  #   unless $TEST_INTERNET_CONNECTIVITY
+  #   unless ENV["TEST_INTERNET_CONNECTIVITY"]
   #     allow(Aws::S3::Bucket).to receive(:new) {nil}
   #     allow(Aws::S3::Bucket).to receive(:exists?) {true}
   #   end

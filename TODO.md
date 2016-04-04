@@ -1,6 +1,5 @@
 ### Missing Tests
 * [ ] Add explicit tests for internet-enabled configs
-* [ ] Implement test for image data without master
 * [ ] Add tests for baseUriRedirect
 * [ ] Implement NoMaster check
 * [ ] Figure out how to optimize the image writing
@@ -13,7 +12,6 @@
 * [ ] Add in link header for images: Link: <http://iiif.example.com/server/full/full/0/default.jpg; rel="canonical", and then add "profileLinkHeader" as a feature
 * [ ] Add in header for info: Link: <http://iiif.io/api/image/2/context.json>; rel="http://www.w3.org/ns/* [ ] json-ld#context"; type="application/ld+json"
 * [ ] Look into Content-Disposition header
-* [ ] Add :verbose flag
 
 
 ###
@@ -39,4 +37,6 @@ Redirects are only supported by the static website endpoints, which contain "s3-
 * [X] Generate intermediate json files for the sub-components
 * [X] Add in URI Encoding check for IDs
 * [X] Add in redirect (303) from image.info ID to the actual JSON doc, and then add "baseUriRedirect" as a feature
+* [X] Add :verbose flag
+* [X] Implement test for image data without master
 

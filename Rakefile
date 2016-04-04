@@ -15,8 +15,8 @@ task :cls do
 end
 
 task :full do
-  $TEST_INTERNET_CONNECTIVITY = true
-  $SKIP_EXPENSIVE_TESTS = false
+  ENV["TEST_INTERNET_CONNECTIVITY"] = true
+  ENV["SKIP_EXPENSIVE_TESTS"] = false
 end
 
 task :default => [:cls, :spec, :yard]

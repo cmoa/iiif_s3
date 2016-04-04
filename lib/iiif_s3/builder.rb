@@ -35,7 +35,7 @@ module IiifS3
 
 
     #
-    # Load data into the IIF builder. 
+    # Load data into the IIIF builder. 
     # 
     # This will load the data, perform some basic verifications on it, and sort
     # it into proper order.
@@ -91,11 +91,14 @@ module IiifS3
         manifests.push generate_manifest(val, @config) 
       end
 
-      # Generate the collection
-      collection = Collection.new("Test Data",@config)
+      generate_collection
+    end    
+
+    def generate_collection(label="top")
+      collection = Collection.new(label,@config)
       manifests.each{|m| collection.add_manifest(m)}
       collection.save
-    end    
+    end
 
     # Creates the required directories for exporting to the file system.
     #
@@ -107,8 +110,6 @@ module IiifS3
       Dir.mkdir img_dir unless Dir.exists?(img_dir)
     end
 
-
-    #
     # Load data into the IIIF server from a CSV
     #
     # @param [String] csv_path Path to the CSV file containing the image data
@@ -117,17 +118,14 @@ module IiifS3
     # @todo Fix this to use the correct data format!
     # 
     def load_csv(csv_path)
-
       raise Error::InvalidCSV unless File.exist? csv_path
       begin
         vals = CSV.read(csv_path)
-
       rescue CSV::MalformedCSVError
         raise Error::InvalidCSV
       end  
 
       raise Error::BlankCSV if vals.length == 0
-
       raise Error::InvalidCSV if vals[0].length != 3
 
       # remove optional header
@@ -142,9 +140,9 @@ module IiifS3
       end
     end 
 
-
     protected
 
+    #----------------------------------------------------------------
     def load_variants(path)
       data = JSON.parse File.read(path)
      
