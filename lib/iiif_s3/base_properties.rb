@@ -90,20 +90,5 @@ module IiifS3
 
     protected
 
-    #--------------------------------------------------------------------------
-    def save_to_disk(data)
-      path = data['@id'].gsub(@config.base_url,@config.output_dir)
-      path_parts = path.split("/")
-      path_parts.pop
-      dir = path_parts.join("/")
-      data["@context"] ||= IiifS3::PRESENTATION_CONTEXT
-      puts "making dir: #{dir}" if @config.verbose?
-      FileUtils::mkdir_p dir unless Dir.exists? dir
-      puts "writing #{path}" if @config.verbose?
-      File.open(path, "w") do |file|
-         file.puts JSON.pretty_generate(data)
-      end
-      add_file_to_s3(path) if @config.upload_to_s3
-    end
   end
 end

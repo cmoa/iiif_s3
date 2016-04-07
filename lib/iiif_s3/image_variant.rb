@@ -3,8 +3,9 @@ require "mini_magick"
 require 'fileutils'
 require_relative "utilities"
 
-
 module IiifS3
+
+  FakeImageVariant = Struct.new(:id, :width, :height, :uri)
 
   #
   # Class ImageVariant represents a single image file within a manifest.

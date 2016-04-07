@@ -122,7 +122,7 @@ module IiifS3
         @prefix = "/#{@prefix}" 
       end
       @thumbnail_size = opts[:thumbnail_size] || DEFAULT_THUMBNAIL_SIZE
-      verbose = opts.fetch(:verbose, false)
+      @verbose = opts.fetch(:verbose, false)
     end
 
 
@@ -138,14 +138,6 @@ module IiifS3
         valid &&= instance_variable_get(v) == other_config.instance_variable_get(v)
       end
       valid
-    end
-
-    # Set if the application should log debugging data to the console
-    #
-    # @param [Bool] val
-    # @return [Bool] 
-    def verbose=(val)
-      @verbose = !!val
     end
   end
 end

@@ -3,7 +3,7 @@ require_relative "utilities"
 
 module IiifS3
   class Builder
-    
+
     include Utilities::Helpers
 
     HEADER_VAL = 'filename'
@@ -65,7 +65,7 @@ module IiifS3
     #
     # @return [Void]
     # 
-    def process_data(force_image_generation=true)
+    def process_data(force_image_generation=false)
       return nil if @data.nil? # do nothing without data.
 
       resources = {}
@@ -74,8 +74,10 @@ module IiifS3
         # image generation
         # 
         # It attempts to load the info files and skip generation — not currently working.
-        if (File.exist?(image_info_file_name(image_record)) && !force_image_generation)
-          image_record.variants load_variants(image_info_file_name(image_record))
+        info_file = image_info_file_name(image_record)
+        if (File.exist?(info_file) && !force_image_generation)
+          puts "skipping #{info_file}" if @config.verbose?
+          image_record.variants = load_variants(info_file)
         else
           image_record.variants = generate_variants(image_record, @config)
           generate_tiles(image_record, @config)
@@ -144,24 +146,12 @@ module IiifS3
 
     #----------------------------------------------------------------
     def load_variants(path)
+
       data = JSON.parse File.read(path)
-     
-      # s
-      # puts data
-      full = Ostruct.new({
-        width: data["width"],
-        height: data["height"],
-        id: data["id"],
-        uri: "#{data["id"]}/full/full/0/default.jpg"
-      })
-      thumb_size = data["sizes"].find{|a| a["width"] == Thumbnail::DEFAULT_MAX_SIZE || a["height"] == Thumbnail::DEFAULT_MAX_SIZE}
-      thumbnail = Ostruct.new({
-        width: thumb_size["width"],
-        height: thumb_size["height"],
-        id: data["id"],
-        uri: "#{data["id"]}/full/#{thumb_size["width"]},/0/default.jpg"
-      })
-      return [full,thumbnail]
+      full = FakeImageVariant.new( data["id"],data["width"], data["height"], "#{data["id"]}/full/full/0/default.jpg")
+      thumb_size = data["sizes"].find{|a| a["width"] == config.thumbnail_size || a["height"] == config.thumbnail_size}
+      thumbnail = FakeImageVariant.new( data["id"],thumb_size["width"], thumb_size["height"],"#{data["id"]}/full/#{thumb_size["width"]},/0/default.jpg")
+      return {full: full, thumbnail: thumbnail}
     end
 
     def generate_tiles(data, config) 
@@ -224,6 +214,19 @@ module IiifS3
       m = Manifest.new(data, config)
       m.save_all_files_to_disk
       return m
+    end
+
+    def build_a_manifest
+
+      manifest_uri = "@config.s3.bucket/#{generate_id(record)}/manifest.json"
+      # response = Typhoeus.get(manifest_uri, followlocation: true)
+      # if response.code == 200
+      #   puts "Skipping #{file}—Manifest already exists." if verbose
+      #   data = JSON.parse(response.body)
+      #   obj = IiifS3::FakeManifest.new(data["@id"], data["@type"], data["label"])
+      #   @iiif.manifests.push(obj)
+      #   next
+      # end 
     end
 
 

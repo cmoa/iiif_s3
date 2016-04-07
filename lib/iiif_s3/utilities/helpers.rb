@@ -48,9 +48,28 @@ module IiifS3
       end
 
 
-      def add_file_to_s3(filename)
+      def get_data_path(data)
+        data['@id'].gsub(@config.base_url,@config.output_dir)
+      end
+
+      def save_to_disk(data)
+        path = get_data_path(data)
+        data["@context"] ||= IiifS3::PRESENTATION_CONTEXT
+        puts "writing #{path}" if @config.verbose?
+        FileUtils::mkdir_p File.dirname(path)
+        File.open(path, "w") do |file|
+           file.puts JSON.pretty_generate(data)
+        end
+        add_file_to_s3(path) if @config.upload_to_s3
+      end
+
+      def get_s3_key(filename)
         key = filename.gsub(@config.output_dir,"")
         key = key[1..-1] if key[0] == "/"
+      end
+
+      def add_file_to_s3(filename)
+        key = get_s3_key(filename)
         if File.extname(filename) == ".json" || File.extname(filename)  == ""
           @config.s3.add_json(key,filename) 
         elsif  File.extname(filename) == ".jpg" 
@@ -60,6 +79,8 @@ module IiifS3
         end
       end
 
+
+
       def add_default_redirect(filename) 
         key = filename.gsub(@config.output_dir,"")
         key = key[1..-1] if key[0] == "/"
@@ -68,7 +89,7 @@ module IiifS3
 
         unless key == name_key
           key = "#{@config.base_url}/#{key}"
-          puts "adding redirect from #{name_key} to #{key}" if verbose?
+          puts "adding redirect from #{name_key} to #{key}" if @config.verbose?
           @config.s3.add_redirect(name_key, key)
         end
       end

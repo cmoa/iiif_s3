@@ -18,7 +18,7 @@ module IiifS3
       # 
       def self.split(path, options={})
 
-        output_dir = options.fetch(:output_dir, "./tmp")
+        output_dir = options.fetch(:output_dir, ".")
         verbose = options.fetch(:verbose, false)
         puts "processing #{path}" if verbose
         name = File.basename(path, File.extname(path))

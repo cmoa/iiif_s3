@@ -1,5 +1,7 @@
 module IiifS3
 
+  FakeManifest = Struct.new(:id, :type, :label)
+
   #
   # Class Manifest is an abstraction over the IIIF Manifest, and by extension over the
   # entire Presentation API.  It takes the internal representation of data and converts
@@ -8,6 +10,7 @@ module IiifS3
   #
   # @author David Newbury <david.newbury@gmail.com>
   #
+
   class Manifest
 
     # @return [String] The IIIF default type for a manifest.
