@@ -2,20 +2,6 @@
 
 This software library is designed to be used to generate IIIF compatible images stacks and metatdata from a collection of images, and then to upload those images to Amazon S3 for static serving.  
 
-It accepts a CSV file of records.  Those CSV files should be in the following format:
-
-filename          | identifier
-------------------|------------
-./images/test.png | 111222333
-
-The headers are optional, but recommended.
-
-
-Standard use of the tool is:
-
-iiif_s3 publish <file.csv>
-
-
 ## Installation
 
 This library assumes that you have ImageMagick installed.  If you need to install it, follow the instructions:
@@ -57,6 +43,21 @@ IiifS3 assumes that you have an Amazon S3 account configured for use.  By defaul
   ENV['AWS_REGION']
 
 
+---
+
+**The following facts are not actually true.  They should be as soon as this is at version 1.0, and this is published to RubyGems.**
+
+This tool is designed to accepts a CSV file of records.  Those CSV files should be in the following format:
+
+filename          | identifier |
+------------------|------------|
+./images/test.png | 111222333  | 
+
+The headers are optional, but recommended.
+
+Standard use of the tool is:
+
+iiif_s3 publish <file.csv>
 
 
 ## Contributing

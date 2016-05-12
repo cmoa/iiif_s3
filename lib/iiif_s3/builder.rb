@@ -211,9 +211,14 @@ module IiifS3
 
 
     def generate_manifest(data, config)
-      m = Manifest.new(data, config)
-      m.save_all_files_to_disk
-      return m
+      begin
+        m = Manifest.new(data, config)
+        m.save_all_files_to_disk
+        return m
+      rescue NoMethodError
+        puts data
+        exit
+      end
     end
 
     def build_a_manifest
