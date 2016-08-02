@@ -64,7 +64,7 @@ module IiifS3
 
 
 
-  # Validates a viewing direction string against the IIIF V.2 spec.
+  # Validates a viewing direction string against the IIIF V.2.0 spec.
   #
   # According to v2 of the IIIF standards, there are only four valid viewing directions:
   # "left-to-right", "top-to-bottom”, "bottom-to-top" , and "right-to-left".  This

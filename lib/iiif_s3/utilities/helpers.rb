@@ -79,8 +79,6 @@ module IiifS3
         end
       end
 
-
-
       def add_default_redirect(filename) 
         key = filename.gsub(@config.output_dir,"")
         key = key[1..-1] if key[0] == "/"

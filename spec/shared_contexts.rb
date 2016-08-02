@@ -69,7 +69,7 @@ RSpec.shared_context "fake data" do
   "label": "test label",
   "attribution": "All rights reserved",
   "logo": "http://www.example.com/logo.jpg",
-  "thumbnail": null,
+  "thumbnail": "http://www.example.com/images/1/full/100,/0/default.jpg",
   "viewingDirection": "left-to-right",
   "viewingHint": "individuals",
   "sequences": [
@@ -83,14 +83,14 @@ RSpec.shared_context "fake data" do
           "label": "front",
           "width": 2000,
           "height": 2400,
-          "thumbnail": null,
+          "thumbnail": "http://www.example.com/images/1/full/100,/0/default.jpg",
           "images": [
             {
               "@type": "oa:Annotation",
               "@id": "http://0.0.0.0/1/annotation/front.json",
               "motivation": "sc:painting",
               "resource": {
-                "@id": null,
+                "@id": "http://www.example.com/images/1/full/full/0/default.jpg",
                 "@type": "dcterms:Image",
                 "format": "image/jpeg",
                 "service": {

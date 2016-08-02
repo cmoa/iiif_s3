@@ -1,5 +1,6 @@
 require 'json/ld'
 require_relative "utilities"
+require 'pathname'
 
 module IiifS3
   class Builder
@@ -148,10 +149,17 @@ module IiifS3
     def load_variants(path)
 
       data = JSON.parse File.read(path)
-      full = FakeImageVariant.new( data["id"],data["width"], data["height"], "#{data["id"]}/full/full/0/default.jpg")
+      id = data["@id"]
+      w = data["width"]
+      h = data["height"]
       thumb_size = data["sizes"].find{|a| a["width"] == config.thumbnail_size || a["height"] == config.thumbnail_size}
-      thumbnail = FakeImageVariant.new( data["id"],thumb_size["width"], thumb_size["height"],"#{data["id"]}/full/#{thumb_size["width"]},/0/default.jpg")
-      return {full: full, thumbnail: thumbnail}
+      thumb_w = thumb_size["width"]
+      thumb_h = thumb_size["height"]
+      full_url = "#{id}/full/full/0/default.jpg"
+      thumb_url = "#{id}/full/#{thumb_w},/0/default.jpg"
+      full = FakeImageVariant.new( id,w, h,full_url)
+      thumbnail = FakeImageVariant.new( id, thumb_w, thumb_h, thumb_url)
+      return {"full" => full, "thumbnail" => thumbnail}
     end
 
     def generate_tiles(data, config) 
@@ -199,6 +207,7 @@ module IiifS3
       info = ImageInfo.new(data.variants["full"].id, data.variants ,config.tile_width, config.tile_scale_factors)
 
       puts "writing #{filename}" if config.verbose?
+      Pathname.new(Pathname.new(filename).dirname).mkpath
       File.open(filename, "w") do |file|
        file.puts info.to_json 
       end
@@ -211,14 +220,15 @@ module IiifS3
 
 
     def generate_manifest(data, config)
-      begin
+      #begin
         m = Manifest.new(data, config)
         m.save_all_files_to_disk
         return m
-      rescue NoMethodError
-        puts data
-        exit
-      end
+      # rescue NoMethodError => e
+      # puts e
+      # puts data
+      # exit
+      #nd
     end
 
     def build_a_manifest

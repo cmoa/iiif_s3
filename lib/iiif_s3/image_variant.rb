@@ -5,7 +5,7 @@ require_relative "utilities"
 
 module IiifS3
 
-  FakeImageVariant = Struct.new(:id, :width, :height, :uri)
+  FakeImageVariant = Struct.new(:id, :width, :height, :uri, :mime_type)
 
   #
   # Class ImageVariant represents a single image file within a manifest.
