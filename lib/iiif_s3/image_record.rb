@@ -51,7 +51,7 @@ module IiifS3
     end
 
     def path=(_path)
-      raise IiifS3::Error::InvalidImageData unless _path && File.exist?(_path)
+      raise IiifS3::Error::InvalidImageData, "Path is invalid: '#{_path}'" unless _path && File.exist?(_path)
       @path = _path
     end
 
