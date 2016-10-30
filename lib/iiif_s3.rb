@@ -1,5 +1,5 @@
 require 'csv'
-require 'JSON'
+require 'json'
 
 require "iiif_s3/version"
 require "iiif_s3/errors"
