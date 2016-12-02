@@ -15,6 +15,9 @@ module IiifS3
     attr_accessor :label
     attr_accessor :description
     attr_accessor :attribution
+    attr_accessor :license
+    attr_accessor :metadata
+
     attr_accessor :logo
     attr_accessor :variants
     

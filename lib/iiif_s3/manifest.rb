@@ -43,6 +43,8 @@ module IiifS3
       self.description =  @primary.description || opts[:description]
       self.attribution =  @primary.attribution || opts.fetch(:attribution, nil) 
       self.logo =         @primary.logo        || opts.fetch(:logo, nil)
+      self.license =      @primary.license     || opts.fetch(:license, nil)
+      self.metadata =     @primary.metadata    || opts.fetch(:metadata, nil)
 
       @sequences = build_sequence(image_records)
     end

@@ -75,6 +75,7 @@ module IiifS3
       obj["attribution"] = self.attribution if self.attribution
       obj["license"] = self.license if self.license
       obj["related"] = self.related if self.related
+      obj["metadata"] = self.metadata if self.metadata
 
       obj
     end
