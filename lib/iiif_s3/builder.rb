@@ -67,6 +67,7 @@ module IiifS3
     # 
     def process_data(force_image_generation=false)
       return nil if @data.nil? # do nothing without data.
+      @manifests = []
 
       resources = {}
       @data.each do |image_record|
@@ -156,8 +157,8 @@ module IiifS3
       thumb_h = thumb_size["height"]
       full_url = "#{id}/full/full/0/default.jpg"
       thumb_url = "#{id}/full/#{thumb_w},/0/default.jpg"
-      full = FakeImageVariant.new( id,w, h,full_url)
-      thumbnail = FakeImageVariant.new( id, thumb_w, thumb_h, thumb_url)
+      full = FakeImageVariant.new( id,w, h,full_url, "image/jpeg")
+      thumbnail = FakeImageVariant.new( id, thumb_w, thumb_h, thumb_url, "image/jpeg")
       return {"full" => full, "thumbnail" => thumbnail}
     end
 
@@ -219,15 +220,9 @@ module IiifS3
 
 
     def generate_manifest(data, config)
-      #begin
         m = Manifest.new(data, config)
         m.save_all_files_to_disk
         return m
-      # rescue NoMethodError => e
-      # puts e
-      # puts data
-      # exit
-      #nd
     end
 
     def build_a_manifest

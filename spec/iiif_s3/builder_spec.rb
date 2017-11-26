@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'ostruct'
+require 'fileutils'
 
 describe IiifS3::Builder do
   # before(:each) do
@@ -48,9 +49,10 @@ describe IiifS3::Builder do
     end
   end
 
-  context " when processing data" do
+  context "when processing data" do
     include_context("fake variants")
     include_context("fake data")
+
     before(:example) do
       @iiif = IiifS3::Builder.new({base_url: 'http://0.0.0.0', verbose: true, thumbnail_size: 120})
       @iiif.load(@fake_data)
@@ -73,6 +75,49 @@ describe IiifS3::Builder do
     end
   end
 
+
+  context "when dealing with already loaded data" do
+    include_context("fake data")
+    include_context("fake variants")
+
+    before(:example) do
+      @dir = Dir.mktmpdir
+      @iiif = IiifS3::Builder.new({output_dir: @dir, base_url: 'http://0.0.0.0', verbose: true, thumbnail_size: 120})
+      @iiif.load(@fake_data)
+      @info_json = "#{@dir}/images/1-1/info.json"
+      allow(@iiif).to receive(:generate_tiles) {nil}
+      allow(@iiif).to receive(:generate_variants) {@fake_variants}
+      @iiif.process_data
+    end
+
+    after(:example) do
+      FileUtils.remove_entry @dir
+    end
+
+    it "has the temporary file" do
+      expect(File.exist?(@info_json)).to eq true
+    end
+
+   it "does try to generate images if that file is missing" do
+      File.delete(@info_json)
+      @iiif.process_data
+      expect(@iiif).to have_received(:generate_tiles).twice
+      expect(@iiif).to have_received(:generate_variants).twice
+    end
+
+    it "does not try to generate images if that file is present" do
+      @iiif.process_data
+      expect(@iiif).to have_received(:generate_tiles).once
+      expect(@iiif).to have_received(:generate_variants).once
+    end
+
+    it "generates the correct manifest anyway" do
+      @iiif.process_data
+      expect(@iiif.manifests.count).to eq 1
+      expect(@iiif.manifests.first.to_json).to eq @fake_manifest
+    end
+
+  end
 
   context "When load_csving CSV files" do
     it "accepts a path" do

@@ -17,7 +17,7 @@ module IiifS3
     DEFAULT_TILE_WIDTH = 512
     # @return [Array<Number>] The default tile scaling factors
     DEFAULT_TILE_SCALE_FACTORS = [1,2,4,8]
-    # @return [Number] The default thumnail size in pixels
+    # @return [Number] The default thumbnail size in pixels
     DEFAULT_THUMBNAIL_SIZE = 250    
 
     #
@@ -107,22 +107,21 @@ module IiifS3
     # @option opts [String] :prefix ("") a prefix (read: subdirectory) for the generated URIs.
     # @option opts [Hash{String: String}] :variants
     def initialize(opts = {})
-      @upload_to_s3 = opts[:upload_to_s3] || false
-      @s3 = IiifS3::AmazonS3.new if @upload_to_s3
-      @tile_width = opts[:tile_width] || DEFAULT_TILE_WIDTH
-      @tile_scale_factors = opts[:tile_scale_factors] || DEFAULT_TILE_SCALE_FACTORS
+      @upload_to_s3   = opts[:upload_to_s3] || false
+      @s3             = IiifS3::AmazonS3.new if @upload_to_s3
+      @tile_width     = opts[:tile_width]                 || DEFAULT_TILE_WIDTH
+      @tile_scale_factors = opts[:tile_scale_factors]     || DEFAULT_TILE_SCALE_FACTORS
       @image_directory_name = opts[:image_directory_name] || DEFAULT_IMAGE_DIRECTORY_NAME
-      @base_url = opts[:base_url] || ( @upload_to_s3 ? @s3.bucket.url : DEFAULT_URL)
-      @use_extensions = opts.fetch(:use_extensions, true)
-      @output_dir = opts[:output_dir] || DEFAULT_OUTPUT_DIRECTORY
-      @image_dir = @output_dir
-      @variants = opts[:variants] || {}
-      @prefix = opts[:prefix] || ""
+      @base_url       = opts[:base_url]                   || ( @upload_to_s3 ? @s3.bucket.url : DEFAULT_URL)
+      @use_extensions = opts.fetch(:use_extensions, true) ## true
+      @output_dir     = opts[:output_dir]                 || DEFAULT_OUTPUT_DIRECTORY
+      @variants       = opts[:variants]                   || {}
+      @thumbnail_size = opts[:thumbnail_size]             || DEFAULT_THUMBNAIL_SIZE
+      @verbose        = opts.fetch(:verbose, false)       ## false
+      @prefix         = opts[:prefix]                     || ""
       if @prefix.length > 0 && @prefix[0] != "/"
         @prefix = "/#{@prefix}" 
       end
-      @thumbnail_size = opts[:thumbnail_size] || DEFAULT_THUMBNAIL_SIZE
-      @verbose = opts.fetch(:verbose, false)
     end
 
 

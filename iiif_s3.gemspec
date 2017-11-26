@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["david.newbury@gmail.com"]
   spec.summary       = "A generator for an IIIF level 0 compatible static server on Amazon S3."
   spec.description   = ""
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/cmoa/iiif_s3"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
