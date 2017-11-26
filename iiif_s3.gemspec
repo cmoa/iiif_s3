@@ -27,10 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'dotenv'
   spec.add_development_dependency "simplecov", "~> 0.10"
 
-  spec.add_runtime_dependency "commander", "~> 4.3"
-  spec.add_runtime_dependency "aws-sdk", "~> 2.1"
-  spec.add_runtime_dependency "mini_magick", "~> 4.2"
-  spec.add_runtime_dependency "rmagick", "~> 2.15"
-  spec.add_runtime_dependency "json-ld", "~> 2.1"
-  spec.add_runtime_dependency "jsonlint", "~> 0.1"
+  spec.add_runtime_dependency gem 'aws-sdk', '~> 3'
+  spec.add_runtime_dependency "mini_magick", ">= 4.8"
 end

@@ -1,4 +1,3 @@
-require 'json/ld'
 require_relative "utilities"
 require 'pathname'
 

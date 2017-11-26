@@ -37,27 +37,9 @@ IiifS3 assumes that you have an Amazon S3 account configured for use.  By defaul
 > 
   ENV['AWS_ACCESS_KEY_ID'] and ENV['AWS_SECRET_ACCESS_KEY']
   The shared credentials ini file at ~/.aws/credentials (more information)
-  From an instance profile when running on EC2
-
+  From an instance profile when running on EC2.
   The SDK also searches the following locations for a region:
   ENV['AWS_REGION']
-
-
----
-
-**The following facts are not actually true.  They should be as soon as this is at version 1.0, and this is published to RubyGems.**
-
-This tool is designed to accepts a CSV file of records.  Those CSV files should be in the following format:
-
-filename          | identifier |
-------------------|------------|
-./images/test.png | 111222333  | 
-
-The headers are optional, but recommended.
-
-Standard use of the tool is:
-
-iiif_s3 publish <file.csv>
 
 
 ## Contributing

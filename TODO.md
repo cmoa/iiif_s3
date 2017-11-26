@@ -23,20 +23,3 @@ Redirects are only supported by the static website endpoints, which contain "s3-
 * Ask about sizes vs canonical form?  Redirect?
 * What does "The @context, @id and @type properties are required when the profile is dereferenced from a URI, but should not be included in the Image Information response." <http://iiif.io/api/image/2.0/#image-information>
 * Ask about Sequence Description
-
-
-----
-
-* [X] Add in "cors" as a feature
-* [X] Add in "sizeByWhListed" as a feature
-* [X] Add PDF support
-* [X] Make the project respect the .json/no .json config
-* [X] Stub out file writing for the tests
-* [X] Document the configuration object
-* [X] Actually delete temp files
-* [X] Generate intermediate json files for the sub-components
-* [X] Add in URI Encoding check for IDs
-* [X] Add in redirect (303) from image.info ID to the actual JSON doc, and then add "baseUriRedirect" as a feature
-* [X] Add :verbose flag
-* [X] Implement test for image data without master
-
