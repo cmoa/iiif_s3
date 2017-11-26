@@ -31,8 +31,8 @@ module IiifS3
     # @option opts [String] :label The human-readable label for all grouped records
     # @option opts [String] :description A longer, human-readable description of the gropued records
     # @option opts [String] :logo A URL pointing to a logo of the institution
-    # @option opts [Hash]   :variants A hash of names
-    #   @example {thumb}
+    # @option opts [Hash]   :variants A hash of derivative names and sizes
+    #   @example {thumb: 150}
     def initialize(opts={})
       opts.each do |key, val|
         self.send("#{key}=",val) if self.methods.include? "#{key}=".to_sym

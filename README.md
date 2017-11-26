@@ -17,6 +17,10 @@ brew reinstall --with-libtiff --ignore-dependencies imagemagick
 
 ```
 
+If you plan to work with PDFs, you should also have a copy of GostScript installed. 
+
+on OSX, `brew install gs`
+
 
 Add this line to your application's Gemfile:
 

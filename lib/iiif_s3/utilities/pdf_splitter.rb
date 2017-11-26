@@ -1,4 +1,4 @@
-require 'rmagick'
+require "mini_magick"
 
 module IiifS3
   module Utilities
@@ -23,20 +23,25 @@ module IiifS3
         puts "processing #{path}" if verbose
         name = File.basename(path, File.extname(path))
 
-        im = Magick::ImageList.new(path) do
-          self.quality = 80
-          self.density = '300'
-          self.colorspace = Magick::RGBColorspace
-          self.interlace = Magick::NoInterlace
-        end
-
         pages = []
-        im.each_with_index do |page, index|
+
+        pdf = MiniMagick::Image.open(path)
+
+        pdf.pages.each_with_index do |page, index|
           page_file_name = "#{output_dir}/#{name}_#{index+1}.jpg"
-          page.write(page_file_name)
+          
+          MiniMagick::Tool::Convert.new do |convert|
+            convert.density("300")
+            convert.units("PixelsPerInch")
+            convert << page.path  
+            convert.quality("80")
+            convert.colorspace("sRGB")
+            convert.interlace("none")
+            convert.flatten
+            convert << page_file_name
+          end
           pages.push(page_file_name)
         end
-        im.destroy!
         GC.start
         pages
       end
